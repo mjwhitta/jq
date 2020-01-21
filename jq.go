@@ -33,6 +33,22 @@ func (j *JSON) GetBlob() (string, error) {
 	return string(blob), nil
 }
 
+// GetBlobIndent will return the JSON blob as a string with the
+// specified prefix and indentation.
+func (j *JSON) GetBlobIndent(
+	pre string,
+	indent string,
+) (string, error) {
+	var blob []byte
+	var e error
+
+	if blob, e = json.MarshalIndent(j.blob, pre, indent); e != nil {
+		return "", e
+	}
+
+	return string(blob), nil
+}
+
 // Has will return true if the JSON blob has the specified key, false
 // otherwise.
 func (j *JSON) Has(key string) bool {
@@ -45,4 +61,14 @@ func (j *JSON) Has(key string) bool {
 // blob.
 func (j *JSON) Set(key string, value interface{}) {
 	j.blob[key] = value
+}
+
+func (j *JSON) SetBlob(blob string) error {
+	var e error
+
+	if e = json.Unmarshal([]byte(blob), &j.blob); e != nil {
+		return e
+	}
+
+	return nil
 }
