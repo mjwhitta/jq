@@ -232,9 +232,11 @@ func (j *JSON) nestedGetKey(keys []interface{}) interface{} {
         } else if tryInt, e = asInt(key); e == nil {
             v = val.([]interface{})[tryInt]
         }
-        if e != nil {
+
+        if (e != nil) || (v == nil) {
             panic(errors.New(fmt.Sprintf("key %v not found", keys)))
         }
+
         val = v
     }
 
