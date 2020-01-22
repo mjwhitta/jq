@@ -63,10 +63,28 @@ EOF
     cat <<EOF
 func (j *JSON) Get${type^}(key ...interface{}) $type {
     var ok bool
-    var val $type
+    var val interface{}
 
-    if val, ok = j.nestedGetKey(key).($type); ok {
-        return val
+    if val, ok = j.nestedGetKey(key).(float64); ok {
+        return $type(val.(float64))
+    } else if val, ok = j.nestedGetKey(key).(float32); ok {
+        return $type(val.(float32))
+    } else if val, ok = j.nestedGetKey(key).(int64); ok {
+        return $type(val.(int64))
+    } else if val, ok = j.nestedGetKey(key).(int32); ok {
+        return $type(val.(int32))
+    } else if val, ok = j.nestedGetKey(key).(int16); ok {
+        return $type(val.(int16))
+    } else if val, ok = j.nestedGetKey(key).(int); ok {
+        return $type(val.(int))
+    } else if val, ok = j.nestedGetKey(key).(uint64); ok {
+        return $type(val.(uint64))
+    } else if val, ok = j.nestedGetKey(key).(uint32); ok {
+        return $type(val.(uint32))
+    } else if val, ok = j.nestedGetKey(key).(uint16); ok {
+        return $type(val.(uint16))
+    } else if val, ok = j.nestedGetKey(key).(uint); ok {
+        return $type(val.(uint))
     }
 
     return $type(j.nestedGetKey(key).(float64))
