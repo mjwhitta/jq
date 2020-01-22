@@ -63,6 +63,8 @@ func (j *JSON) Set(key string, value interface{}) {
 	j.blob[key] = value
 }
 
+// SetBlob will replace the underlying map[string]interface{} with a
+// new JSON blob.
 func (j *JSON) SetBlob(blob string) error {
 	var e error
 
