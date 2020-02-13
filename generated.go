@@ -91,32 +91,34 @@ func (j *JSON) GetBoolMap(key ...interface{}) map[string]bool {
 // GetFloat32 will return the value for the specified key(s) as a
 // float32.
 func (j *JSON) GetFloat32(key ...interface{}) float32 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return float32(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return float32(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return float32(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return float32(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return float32(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return float32(val.(int8))
+	case int:
 		return float32(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return float32(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return float32(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return float32(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return float32(val.(uint8))
+	case uint:
 		return float32(val.(uint))
+	default:
+		return float32(val.(float64))
 	}
-
-	return float32(j.nestedGetKey(key).(float64))
 }
 
 // GetFloat32Array will return an array for the specified key(s) as a
@@ -156,32 +158,34 @@ func (j *JSON) GetFloat32Map(key ...interface{}) map[string]float32 {
 // GetFloat64 will return the value for the specified key(s) as a
 // float64.
 func (j *JSON) GetFloat64(key ...interface{}) float64 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return float64(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return float64(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return float64(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return float64(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return float64(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return float64(val.(int8))
+	case int:
 		return float64(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return float64(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return float64(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return float64(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return float64(val.(uint8))
+	case uint:
 		return float64(val.(uint))
+	default:
+		return float64(val.(float64))
 	}
-
-	return float64(j.nestedGetKey(key).(float64))
 }
 
 // GetFloat64Array will return an array for the specified key(s) as a
@@ -221,32 +225,34 @@ func (j *JSON) GetFloat64Map(key ...interface{}) map[string]float64 {
 // GetInt will return the value for the specified key(s) as a
 // int.
 func (j *JSON) GetInt(key ...interface{}) int {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return int(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return int(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return int(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return int(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return int(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return int(val.(int8))
+	case int:
 		return int(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return int(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return int(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return int(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return int(val.(uint8))
+	case uint:
 		return int(val.(uint))
+	default:
+		return int(val.(float64))
 	}
-
-	return int(j.nestedGetKey(key).(float64))
 }
 
 // GetIntArray will return an array for the specified key(s) as a
@@ -286,32 +292,34 @@ func (j *JSON) GetIntMap(key ...interface{}) map[string]int {
 // GetInt16 will return the value for the specified key(s) as a
 // int16.
 func (j *JSON) GetInt16(key ...interface{}) int16 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return int16(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return int16(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return int16(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return int16(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return int16(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return int16(val.(int8))
+	case int:
 		return int16(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return int16(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return int16(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return int16(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return int16(val.(uint8))
+	case uint:
 		return int16(val.(uint))
+	default:
+		return int16(val.(float64))
 	}
-
-	return int16(j.nestedGetKey(key).(float64))
 }
 
 // GetInt16Array will return an array for the specified key(s) as a
@@ -351,32 +359,34 @@ func (j *JSON) GetInt16Map(key ...interface{}) map[string]int16 {
 // GetInt32 will return the value for the specified key(s) as a
 // int32.
 func (j *JSON) GetInt32(key ...interface{}) int32 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return int32(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return int32(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return int32(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return int32(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return int32(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return int32(val.(int8))
+	case int:
 		return int32(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return int32(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return int32(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return int32(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return int32(val.(uint8))
+	case uint:
 		return int32(val.(uint))
+	default:
+		return int32(val.(float64))
 	}
-
-	return int32(j.nestedGetKey(key).(float64))
 }
 
 // GetInt32Array will return an array for the specified key(s) as a
@@ -416,32 +426,34 @@ func (j *JSON) GetInt32Map(key ...interface{}) map[string]int32 {
 // GetInt64 will return the value for the specified key(s) as a
 // int64.
 func (j *JSON) GetInt64(key ...interface{}) int64 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return int64(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return int64(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return int64(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return int64(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return int64(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return int64(val.(int8))
+	case int:
 		return int64(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return int64(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return int64(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return int64(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return int64(val.(uint8))
+	case uint:
 		return int64(val.(uint))
+	default:
+		return int64(val.(float64))
 	}
-
-	return int64(j.nestedGetKey(key).(float64))
 }
 
 // GetInt64Array will return an array for the specified key(s) as a
@@ -521,32 +533,34 @@ func (j *JSON) GetStringMap(key ...interface{}) map[string]string {
 // GetUint will return the value for the specified key(s) as a
 // uint.
 func (j *JSON) GetUint(key ...interface{}) uint {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return uint(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return uint(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return uint(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return uint(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return uint(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return uint(val.(int8))
+	case int:
 		return uint(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return uint(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return uint(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return uint(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return uint(val.(uint8))
+	case uint:
 		return uint(val.(uint))
+	default:
+		return uint(val.(float64))
 	}
-
-	return uint(j.nestedGetKey(key).(float64))
 }
 
 // GetUintArray will return an array for the specified key(s) as a
@@ -586,32 +600,34 @@ func (j *JSON) GetUintMap(key ...interface{}) map[string]uint {
 // GetUint16 will return the value for the specified key(s) as a
 // uint16.
 func (j *JSON) GetUint16(key ...interface{}) uint16 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return uint16(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return uint16(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return uint16(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return uint16(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return uint16(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return uint16(val.(int8))
+	case int:
 		return uint16(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return uint16(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return uint16(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return uint16(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return uint16(val.(uint8))
+	case uint:
 		return uint16(val.(uint))
+	default:
+		return uint16(val.(float64))
 	}
-
-	return uint16(j.nestedGetKey(key).(float64))
 }
 
 // GetUint16Array will return an array for the specified key(s) as a
@@ -651,32 +667,34 @@ func (j *JSON) GetUint16Map(key ...interface{}) map[string]uint16 {
 // GetUint32 will return the value for the specified key(s) as a
 // uint32.
 func (j *JSON) GetUint32(key ...interface{}) uint32 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return uint32(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return uint32(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return uint32(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return uint32(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return uint32(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return uint32(val.(int8))
+	case int:
 		return uint32(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return uint32(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return uint32(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return uint32(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return uint32(val.(uint8))
+	case uint:
 		return uint32(val.(uint))
+	default:
+		return uint32(val.(float64))
 	}
-
-	return uint32(j.nestedGetKey(key).(float64))
 }
 
 // GetUint32Array will return an array for the specified key(s) as a
@@ -716,32 +734,34 @@ func (j *JSON) GetUint32Map(key ...interface{}) map[string]uint32 {
 // GetUint64 will return the value for the specified key(s) as a
 // uint64.
 func (j *JSON) GetUint64(key ...interface{}) uint64 {
-	var ok bool
-	var val interface{}
+	var val interface{} = j.nestedGetKey(key)
 
-	if val, ok = j.nestedGetKey(key).(float64); ok {
-		return uint64(val.(float64))
-	} else if val, ok = j.nestedGetKey(key).(float32); ok {
+	switch val.(type) {
+	case float32:
 		return uint64(val.(float32))
-	} else if val, ok = j.nestedGetKey(key).(int64); ok {
+	case int64:
 		return uint64(val.(int64))
-	} else if val, ok = j.nestedGetKey(key).(int32); ok {
+	case int32:
 		return uint64(val.(int32))
-	} else if val, ok = j.nestedGetKey(key).(int16); ok {
+	case int16:
 		return uint64(val.(int16))
-	} else if val, ok = j.nestedGetKey(key).(int); ok {
+	case int8:
+		return uint64(val.(int8))
+	case int:
 		return uint64(val.(int))
-	} else if val, ok = j.nestedGetKey(key).(uint64); ok {
+	case uint64:
 		return uint64(val.(uint64))
-	} else if val, ok = j.nestedGetKey(key).(uint32); ok {
+	case uint32:
 		return uint64(val.(uint32))
-	} else if val, ok = j.nestedGetKey(key).(uint16); ok {
+	case uint16:
 		return uint64(val.(uint16))
-	} else if val, ok = j.nestedGetKey(key).(uint); ok {
+	case uint8:
+		return uint64(val.(uint8))
+	case uint:
 		return uint64(val.(uint))
+	default:
+		return uint64(val.(float64))
 	}
-
-	return uint64(j.nestedGetKey(key).(float64))
 }
 
 // GetUint64Array will return an array for the specified key(s) as a

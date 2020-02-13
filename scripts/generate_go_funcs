@@ -55,32 +55,34 @@ EOF
 // Get${type^} will return the value for the specified key(s) as a
 // $rtype.
 func (j *JSON) Get${type^}(key ...interface{}) $rtype {
-    var ok bool
-    var val interface{}
+    var val interface{} = j.nestedGetKey(key)
 
-    if val, ok = j.nestedGetKey(key).(float64); ok {
-        return $type(val.(float64))
-    } else if val, ok = j.nestedGetKey(key).(float32); ok {
+    switch val.(type) {
+    case float32:
         return $type(val.(float32))
-    } else if val, ok = j.nestedGetKey(key).(int64); ok {
+    case int64:
         return $type(val.(int64))
-    } else if val, ok = j.nestedGetKey(key).(int32); ok {
+    case int32:
         return $type(val.(int32))
-    } else if val, ok = j.nestedGetKey(key).(int16); ok {
+    case int16:
         return $type(val.(int16))
-    } else if val, ok = j.nestedGetKey(key).(int); ok {
+    case int8:
+        return $type(val.(int8))
+    case int:
         return $type(val.(int))
-    } else if val, ok = j.nestedGetKey(key).(uint64); ok {
+    case uint64:
         return $type(val.(uint64))
-    } else if val, ok = j.nestedGetKey(key).(uint32); ok {
+    case uint32:
         return $type(val.(uint32))
-    } else if val, ok = j.nestedGetKey(key).(uint16); ok {
+    case uint16:
         return $type(val.(uint16))
-    } else if val, ok = j.nestedGetKey(key).(uint); ok {
+    case uint8:
+        return $type(val.(uint8))
+    case uint:
         return $type(val.(uint))
+    default:
+        return $type(val.(float64))
     }
-
-    return $type(j.nestedGetKey(key).(float64))
 }
 
 // Get${type^}Array will return an array for the specified key(s) as a

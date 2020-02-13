@@ -1,10 +1,14 @@
 package jq
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // JSON is a struct that holds a JSON blob.
 type JSON struct {
-	blob map[string]interface{}
+	blob   map[string]interface{}
+	escape bool
 }
 
 // New is a JSON constructor.
@@ -12,7 +16,7 @@ func New(blob string) (*JSON, error) {
 	var e error
 	var j *JSON
 
-	j = &JSON{blob: map[string]interface{}{}}
+	j = &JSON{blob: map[string]interface{}{}, escape: false}
 
 	if e = json.Unmarshal([]byte(blob), &j.blob); e != nil {
 		return j, e
@@ -23,14 +27,17 @@ func New(blob string) (*JSON, error) {
 
 // GetBlob will return the JSON blob as a string.
 func (j *JSON) GetBlob() (string, error) {
-	var blob []byte
+	var blob = &strings.Builder{}
 	var e error
+	var enc *json.Encoder = json.NewEncoder(blob)
 
-	if blob, e = json.Marshal(j.blob); e != nil {
+	enc.SetEscapeHTML(j.escape)
+
+	if e = enc.Encode(j.blob); e != nil {
 		return "", e
 	}
 
-	return string(blob), nil
+	return blob.String(), nil
 }
 
 // GetBlobIndent will return the JSON blob as a string with the
@@ -39,14 +46,18 @@ func (j *JSON) GetBlobIndent(
 	pre string,
 	indent string,
 ) (string, error) {
-	var blob []byte
+	var blob = &strings.Builder{}
 	var e error
+	var enc *json.Encoder = json.NewEncoder(blob)
 
-	if blob, e = json.MarshalIndent(j.blob, pre, indent); e != nil {
+	enc.SetEscapeHTML(j.escape)
+	enc.SetIndent(pre, indent)
+
+	if e = enc.Encode(j.blob); e != nil {
 		return "", e
 	}
 
-	return string(blob), nil
+	return blob.String(), nil
 }
 
 // Has will return true if the JSON blob has the specified key, false
@@ -73,4 +84,10 @@ func (j *JSON) SetBlob(blob string) error {
 	}
 
 	return nil
+}
+
+// SetEscapeHTML will set whether or not Marshalling should escape
+// HTML special characters.
+func (j *JSON) SetEscapeHTML(escape bool) {
+	j.escape = escape
 }
