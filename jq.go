@@ -37,7 +37,7 @@ func (j *JSON) GetBlob() (string, error) {
 		return "", e
 	}
 
-	return blob.String(), nil
+	return strings.TrimSpace(blob.String()), nil
 }
 
 // GetBlobIndent will return the JSON blob as a string with the
@@ -57,7 +57,7 @@ func (j *JSON) GetBlobIndent(
 		return "", e
 	}
 
-	return blob.String(), nil
+	return strings.TrimSpace(blob.String()), nil
 }
 
 // Has will return true if the JSON blob has the specified key, false
