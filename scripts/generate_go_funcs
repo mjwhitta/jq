@@ -28,139 +28,195 @@ generate_funcs() {
     local rtype="${type:-interface{\}}"
 
     case "$type" in
-        ""|"bool")
-    cat <<EOF
-// Get${type^} will return the value for the specified key(s) as a
-// $rtype.
-func (j *JSON) Get${type^}(key ...interface{}) $rtype {
-    return j.nestedGetKey(key)${type:+.($rtype)}
-}
-
-// Get${type^}Array will return an array for the specified key(s) as a
-// []$rtype.
-func (j *JSON) Get${type^}Array(key ...interface{}) []$rtype {
-    return j.nestedGetKey(key).([]$rtype)
-}
-
-// Get${type^}Map will return a map for the specified key(s) as a
-// map[string]$rtype.
-func (j *JSON) Get${type^}Map(key ...interface{}) map[string]$rtype {
-    return j.nestedGetKey(key).(map[string]$rtype)
+        "") ;;
+        "bool")
+            cat <<EOF
+func as${type^}(v interface{}) ($type, error) {
+    switch v.(type) {
+    case $type:
+        return v.($type), nil
+    default:
+        return false, fmt.Errorf("Not a $type")
+    }
 }
 
 EOF
             ;;
         "float"*|"int"*|"uint"*)
-    cat <<EOF
-// Get${type^} will return the value for the specified key(s) as a
-// $rtype.
-func (j *JSON) Get${type^}(key ...interface{}) $rtype {
-    var val interface{} = j.nestedGetKey(key)
-
-    switch val.(type) {
+            cat <<EOF
+func as${type^}(v interface{}) ($type, error) {
+    switch v.(type) {
+    case float64:
+        return $type(v.(float64)), nil
     case float32:
-        return $type(val.(float32))
+        return $type(v.(float32)), nil
     case int64:
-        return $type(val.(int64))
+        return $type(v.(int64)), nil
     case int32:
-        return $type(val.(int32))
+        return $type(v.(int32)), nil
     case int16:
-        return $type(val.(int16))
+        return $type(v.(int16)), nil
     case int8:
-        return $type(val.(int8))
+        return $type(v.(int8)), nil
     case int:
-        return $type(val.(int))
+        return $type(v.(int)), nil
     case uint64:
-        return $type(val.(uint64))
+        return $type(v.(uint64)), nil
     case uint32:
-        return $type(val.(uint32))
+        return $type(v.(uint32)), nil
     case uint16:
-        return $type(val.(uint16))
+        return $type(v.(uint16)), nil
     case uint8:
-        return $type(val.(uint8))
+        return $type(v.(uint8)), nil
     case uint:
-        return $type(val.(uint))
+        return $type(v.(uint)), nil
     default:
-        return $type(val.(float64))
+        return 0, fmt.Errorf("Not a ${type}")
     }
-}
-
-// Get${type^}Array will return an array for the specified key(s) as a
-// []$rtype.
-func (j *JSON) Get${type^}Array(key ...interface{}) []$rtype {
-    var ok bool
-    var val = []$type{}
-
-    if val, ok = j.nestedGetKey(key).([]$type); ok {
-        return val
-    }
-
-    for _, v := range j.nestedGetKey(key).([]interface{}) {
-        val = append(val, $type(v.(float64)))
-    }
-
-    return val
-}
-
-// Get${type^}Map will return a map for the specified key(s) as a
-// map[string]$rtype.
-func (j *JSON) Get${type^}Map(key ...interface{}) map[string]$rtype {
-    var ok bool
-    var val = map[string]$type{}
-
-    if val, ok = j.nestedGetKey(key).(map[string]$type); ok {
-        return val
-    }
-
-    for k, v := range j.nestedGetKey(key).(map[string]interface{}) {
-        val[k] = $type(v.(float64))
-    }
-
-    return val
 }
 
 EOF
             ;;
         "string")
-    cat <<EOF
+            cat <<EOF
+func as${type^}(v interface{}) ($type, error) {
+    switch v.(type) {
+    case $type:
+        return v.($type), nil
+    default:
+        return "", fmt.Errorf("Not a ${type}")
+    }
+}
+
+EOF
+            ;;
+    esac
+
+    case "$type" in
+        "")
+            cat <<EOF
+// Get will return the value for the specified key(s) as a $rtype.
+func (j *JSON) Get(key ...interface{}) ($rtype, error) {
+    var e error
+    var val interface{}
+
+    if val, e = j.nestedGetKey(key); e != nil {
+        return nil, e
+    }
+
+    return val, nil
+}
+
+// GetArray will return an array for the specified key(s) as an
+// []$rtype.
+func (j *JSON) GetArray(key ...interface{}) ([]$rtype, error) {
+    var e error
+    var ok bool
+    var ret []$rtype
+    var val interface{}
+
+    if val, e = j.nestedGetKey(key); e != nil {
+        return nil, e
+    }
+
+    if ret, ok = val.([]$rtype); !ok {
+        return ret, fmt.Errorf("Not a []$rtype")
+    }
+
+    return ret, nil
+}
+
+// GetMap will return a map for the specified key(s) as a
+// map[string]$rtype.
+func (j *JSON) GetMap(key ...interface{}) (map[string]$rtype, error) {
+    var e error
+    var ok bool
+    var ret  = map[string]$rtype{}
+    var val interface{}
+
+    if val, e = j.nestedGetKey(key); e != nil {
+        return nil, e
+    }
+
+    if ret, ok = val.(map[string]$rtype); !ok {
+        return ret, fmt.Errorf("Not a map[string]$rtype")
+    }
+
+    return ret, nil
+}
+
+EOF
+            ;;
+        "bool"|"float"*|"int"*|"uint"*|"string")
+            cat <<EOF
 // Get${type^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) Get${type^}(key ...interface{}) $type {
-    return j.nestedGetKey(key).($type)
+func (j *JSON) Get${type^}(key ...interface{}) ($rtype, error) {
+    var e error
+    var ret $rtype
+    var val interface{}
+
+    if val, e = j.nestedGetKey(key); e != nil {
+        return ret, e
+    }
+
+    return as${type^}(val)
 }
 
 // Get${type^}Array will return an array for the specified key(s) as a
 // []$rtype.
-func (j *JSON) Get${type^}Array(key ...interface{}) []$type {
+func (j *JSON) Get${type^}Array(
+    key ...interface{},
+) ([]$rtype, error) {
+    var e error
     var ok bool
-    var val = []$type{}
+    var ret = []$rtype{}
+    var tmp $rtype
+    var val interface{}
 
-    if val, ok = j.nestedGetKey(key).([]$type); ok {
-        return val
+    if val, e = j.nestedGetKey(key); e != nil {
+        return ret, e
     }
 
-    for _, v := range j.nestedGetKey(key).([]interface{}) {
-        val = append(val, v.(string))
+    if _, ok = val.([]$rtype); ok {
+        return val.([]$rtype), nil
     }
 
-    return val
+    for _, v := range val.([]interface{}) {
+        if tmp, e = as${type^}(v); e != nil {
+            return []$rtype{}, e
+        }
+        ret = append(ret, tmp)
+    }
+
+    return ret, nil
 }
 
 // Get${type^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) Get${type^}Map(key ...interface{}) map[string]$type {
+func (j *JSON) Get${type^}Map(
+    key ...interface{},
+) (map[string]$rtype, error) {
+    var e error
     var ok bool
-    var val = map[string]$type{}
+    var ret = map[string]$rtype{}
+    var val interface{}
 
-    if val, ok = j.nestedGetKey(key).(map[string]$type); ok {
-        return val
+    if val, e = j.nestedGetKey(key); e != nil {
+        return ret, e
     }
 
-    for k, v := range j.nestedGetKey(key).(map[string]interface{}) {
-        val[k] = v.(string)
+    if _, ok = val.(map[string]$rtype); ok {
+        return val.(map[string]$rtype), nil
     }
 
-    return val
+    for k, v := range val.(map[string]interface{}) {
+        if ret[k], e = as${type^}(v); e != nil {
+            return map[string]$rtype{}, e
+        }
+    }
+
+    return ret, nil
 }
 
 EOF
@@ -214,32 +270,7 @@ package jq
 
 import "fmt"
 
-func asInt(key interface{}) (int, error) {
-    var ok bool
-
-    if _, ok = key.(int); ok {
-        return key.(int), nil
-    } else if _, ok = key.(float64); ok {
-        return int(key.(float64)), nil
-    } else if _, ok = key.(uint64); ok {
-        return int(key.(uint64)), nil
-    }
-
-    return 0, fmt.Errorf("key %v not int type", key)
-}
-
-func asString(key interface{}) (string, error) {
-    var ok bool
-    var val string
-
-    if val, ok = key.(string); ok {
-        return val, nil
-    }
-
-    return "", fmt.Errorf("key %v not string type", key)
-}
-
-func (j *JSON) nestedGetKey(keys []interface{}) interface{} {
+func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
     var e error
     var tryInt int
     var tryString string
@@ -254,13 +285,13 @@ func (j *JSON) nestedGetKey(keys []interface{}) interface{} {
         }
 
         if (e != nil) || (v == nil) {
-            panic(fmt.Errorf("key %v not found", keys))
+            return nil, fmt.Errorf("key %v not found", keys)
         }
 
         val = v
     }
 
-    return val
+    return val, nil
 }
 
 $(
