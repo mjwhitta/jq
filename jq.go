@@ -91,10 +91,12 @@ func (j *JSON) GetKeys(key ...interface{}) ([]string, error) {
 
 // HasKey will return true if the JSON blob has the specified key,
 // false otherwise.
-func (j *JSON) HasKey(key string) bool {
-	var hasKey bool
-	_, hasKey = j.blob[key]
-	return hasKey
+func (j *JSON) HasKey(key ...interface{}) bool {
+	var e error
+
+	_, e = j.nestedGetKey(key)
+
+    return (e == nil)
 }
 
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
