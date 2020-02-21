@@ -3,6 +3,7 @@ package jq
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -67,6 +68,9 @@ func (j *JSON) GetBlobIndent(
 func (j *JSON) GetKeys(key ...interface{}) ([]string, error) {
 	var e error
 	var keys []string
+	var less = func(i, j int) bool {
+		return (strings.ToLower(keys[i]) < strings.ToLower(keys[j]))
+	}
 	var val interface{}
 
 	if val, e = j.nestedGetKey(key); e != nil {
@@ -83,6 +87,11 @@ func (j *JSON) GetKeys(key ...interface{}) ([]string, error) {
 		for k := range val.(map[string]interface{}) {
 			keys = append(keys, k)
 		}
+
+		if !sort.SliceIsSorted(keys, less) {
+			sort.SliceStable(keys, less)
+		}
+
 		return keys, nil
 	default:
 		return keys, fmt.Errorf("Key %v has no valid keys", key)
@@ -96,7 +105,7 @@ func (j *JSON) HasKey(key ...interface{}) bool {
 
 	_, e = j.nestedGetKey(key)
 
-    return (e == nil)
+	return (e == nil)
 }
 
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
