@@ -3,30 +3,6 @@ package jq
 
 import "fmt"
 
-func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
-	var e error
-	var tryInt int
-	var tryString string
-	var v interface{}
-	var val interface{} = j.blob
-
-	for _, key := range keys {
-		if tryString, e = asString(key); e == nil {
-			v = val.(map[string]interface{})[tryString]
-		} else if tryInt, e = asInt(key); e == nil {
-			v = val.([]interface{})[tryInt]
-		}
-
-		if (e != nil) || (v == nil) {
-			return nil, fmt.Errorf("key %v not found", keys)
-		}
-
-		val = v
-	}
-
-	return val, nil
-}
-
 // Get will return the value for the specified key(s) as a interface{}.
 func (j *JSON) Get(key ...interface{}) (interface{}, error) {
 	var e error
@@ -48,7 +24,7 @@ func (j *JSON) GetArray(key ...interface{}) ([]interface{}, error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(key); e != nil {
-		return nil, e
+		return ret, e
 	}
 
 	if ret, ok = val.([]interface{}); !ok {
@@ -67,7 +43,7 @@ func (j *JSON) GetMap(key ...interface{}) (map[string]interface{}, error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(key); e != nil {
-		return nil, e
+		return ret, e
 	}
 
 	if ret, ok = val.(map[string]interface{}); !ok {

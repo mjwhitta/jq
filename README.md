@@ -19,6 +19,7 @@ package main
 
 import (
     "fmt"
+    "os"
     "strings"
 
     "gitlab.com/mjwhitta/jq"
@@ -44,6 +45,7 @@ func main() {
     var err error
     var j *jq.JSON
     var json string
+    var keys []string
 
     json = strings.Join(
         []string{
@@ -56,8 +58,12 @@ func main() {
             "    \"test\"",
             "  ],",
             "  \"e\": {",
+            "    \"aFloat\": 1.2,",
             "    \"anInt\": 0,",
-            "    \"aFloat\": 1.2",
+            "    \"more\": {",
+            "      \"aFloat32\": 1.2,",
+            "      \"anInt64\": 0",
+            "    }",
             "  }",
             "}",
         },
@@ -66,17 +72,20 @@ func main() {
 
     // Initialize JSON object
     if j, err = jq.New(json); err != nil {
-        panic(err)
+        fmt.Println(err.Error())
+        os.Exit(0)
     }
 
     // JSON blob
     if json, err = j.GetBlobIndent("", "  "); err != nil {
-        panic(err)
+        fmt.Println(err.Error())
     }
 
     // Top-level keys
-    if a, err = j.GetBool("a"); e != nil {
-        panic(err)
+    if j.HasKey("a") {
+        if a, err = j.GetBool("a"); e != nil {
+            fmt.Println(err.Error())
+        }
     }
     b, _ = j.GetString("b")
     c, _ = j.GetInt("c")
@@ -100,6 +109,31 @@ func main() {
     fmt.Printf("g = %v\n", g)
     fmt.Printf("h = %v\n", h)
     fmt.Printf("i = %v\n", i)
+
+    // Get sub-keys
+    if keys, err = j.GetKeys("a"); err != nil {
+        fmt.Println(err.Error())
+    } else {
+        fmt.Println(keys)
+    }
+
+    if keys, err = j.GetKeys("d"); err != nil {
+        fmt.Println(err.Error())
+    } else {
+        fmt.Println(keys)
+    }
+
+    if keys, err = j.GetKeys("e"); err != nil {
+        fmt.Println(err.Error())
+    } else {
+        fmt.Println(keys)
+    }
+
+    if keys, err = j.GetKeys("e", "more"); err != nil {
+        fmt.Println(err.Error())
+    } else {
+        fmt.Println(keys)
+    }
 }
 ```
 

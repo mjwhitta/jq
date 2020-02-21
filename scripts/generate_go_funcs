@@ -116,7 +116,7 @@ func (j *JSON) GetArray(key ...interface{}) ([]$rtype, error) {
     var val interface{}
 
     if val, e = j.nestedGetKey(key); e != nil {
-        return nil, e
+        return ret, e
     }
 
     if ret, ok = val.([]$rtype); !ok {
@@ -131,11 +131,11 @@ func (j *JSON) GetArray(key ...interface{}) ([]$rtype, error) {
 func (j *JSON) GetMap(key ...interface{}) (map[string]$rtype, error) {
     var e error
     var ok bool
-    var ret  = map[string]$rtype{}
+    var ret = map[string]$rtype{}
     var val interface{}
 
     if val, e = j.nestedGetKey(key); e != nil {
-        return nil, e
+        return ret, e
     }
 
     if ret, ok = val.(map[string]$rtype); !ok {
@@ -269,30 +269,6 @@ cat >"$file" <<EOF
 package jq
 
 import "fmt"
-
-func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
-    var e error
-    var tryInt int
-    var tryString string
-    var v interface{}
-    var val interface{} = j.blob
-
-    for _, key := range keys {
-        if tryString, e = asString(key); e == nil {
-            v = val.(map[string]interface{})[tryString]
-        } else if tryInt, e = asInt(key); e == nil {
-            v = val.([]interface{})[tryInt]
-        }
-
-        if (e != nil) || (v == nil) {
-            return nil, fmt.Errorf("key %v not found", keys)
-        }
-
-        val = v
-    }
-
-    return val, nil
-}
 
 $(
     for thetype in \

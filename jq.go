@@ -2,6 +2,8 @@ package jq
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -60,12 +62,63 @@ func (j *JSON) GetBlobIndent(
 	return strings.TrimSpace(blob.String()), nil
 }
 
-// Has will return true if the JSON blob has the specified key, false
-// otherwise.
-func (j *JSON) Has(key string) bool {
+// GetKeys will return a list of valid keys if the specified key
+// returns an array or map.
+func (j *JSON) GetKeys(key ...interface{}) ([]string, error) {
+	var e error
+	var keys []string
+	var val interface{}
+
+	if val, e = j.nestedGetKey(key); e != nil {
+		return keys, e
+	}
+
+	switch val.(type) {
+	case []interface{}:
+		for i := 0; i < len(val.([]interface{})); i++ {
+			keys = append(keys, strconv.Itoa(i))
+		}
+		return keys, nil
+	case map[string]interface{}:
+		for k := range val.(map[string]interface{}) {
+			keys = append(keys, k)
+		}
+		return keys, nil
+	default:
+		return keys, fmt.Errorf("Key %v has no valid keys", key)
+	}
+}
+
+// HasKey will return true if the JSON blob has the specified key,
+// false otherwise.
+func (j *JSON) HasKey(key string) bool {
 	var hasKey bool
 	_, hasKey = j.blob[key]
 	return hasKey
+}
+
+func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
+	var e error
+	var tryInt int
+	var tryString string
+	var v interface{}
+	var val interface{} = j.blob
+
+	for _, key := range keys {
+		if tryString, e = asString(key); e == nil {
+			v = val.(map[string]interface{})[tryString]
+		} else if tryInt, e = asInt(key); e == nil {
+			v = val.([]interface{})[tryInt]
+		}
+
+		if (e != nil) || (v == nil) {
+			return nil, fmt.Errorf("key %v not found", keys)
+		}
+
+		val = v
+	}
+
+	return val, nil
 }
 
 // Set will set the specified value for the specified key in the JSON
