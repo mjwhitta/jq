@@ -20,9 +20,7 @@ func New(blob string) (*JSON, error) {
 	var e error
 	var j = &JSON{blob: map[string]interface{}{}, escape: false}
 
-	dec = json.NewDecoder(
-		strings.NewReader(strings.TrimSpace(blob) + "\n"),
-	)
+	dec = json.NewDecoder(strings.NewReader(strings.TrimSpace(blob)))
 
 	if e = dec.Decode(&j.blob); e != nil {
 		return j, e
@@ -147,9 +145,7 @@ func (j *JSON) SetBlob(blob string) error {
 	var dec *json.Decoder
 	var e error
 
-	dec = json.NewDecoder(
-		strings.NewReader(strings.TrimSpace(blob) + "\n"),
-	)
+	dec = json.NewDecoder(strings.NewReader(strings.TrimSpace(blob)))
 
 	if e = dec.Decode(&j.blob); e != nil {
 		return e
