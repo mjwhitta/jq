@@ -16,12 +16,15 @@ type JSON struct {
 
 // New is a JSON constructor.
 func New(blob string) (*JSON, error) {
+	var dec *json.Decoder
 	var e error
-	var j *JSON
+	var j = &JSON{blob: map[string]interface{}{}, escape: false}
 
-	j = &JSON{blob: map[string]interface{}{}, escape: false}
+	dec = json.NewDecoder(
+		strings.NewReader(strings.TrimSpace(blob) + "\n"),
+	)
 
-	if e = json.Unmarshal([]byte(blob), &j.blob); e != nil {
+	if e = dec.Decode(&j.blob); e != nil {
 		return j, e
 	}
 
@@ -141,9 +144,14 @@ func (j *JSON) Set(key string, value interface{}) {
 // SetBlob will replace the underlying map[string]interface{} with a
 // new JSON blob.
 func (j *JSON) SetBlob(blob string) error {
+	var dec *json.Decoder
 	var e error
 
-	if e = json.Unmarshal([]byte(blob), &j.blob); e != nil {
+	dec = json.NewDecoder(
+		strings.NewReader(strings.TrimSpace(blob) + "\n"),
+	)
+
+	if e = dec.Decode(&j.blob); e != nil {
 		return e
 	}
 
@@ -154,4 +162,11 @@ func (j *JSON) SetBlob(blob string) error {
 // HTML special characters.
 func (j *JSON) SetEscapeHTML(escape bool) {
 	j.escape = escape
+}
+
+// String will return a string representation of JSON instance.
+func (j *JSON) String() string {
+	var str string
+	str, _ = j.GetBlobIndent("", "  ")
+	return str
 }
