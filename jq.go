@@ -138,8 +138,50 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 
 // Set will set the specified value for the specified key in the JSON
 // blob.
-func (j *JSON) Set(key string, value interface{}) {
-	j.blob[key] = value
+func (j *JSON) Set(value interface{}, keys ...interface{}) error {
+	var e error
+	var parentArr []interface{}
+	var parentMap = map[string]interface{}{}
+	var tryInt int
+	var tryString string
+
+	if len(keys) == 0 {
+		return nil
+	} else if len(keys) == 1 {
+		if tryString, e = asString(keys, keys[0]); e != nil {
+			return e
+		}
+
+		j.blob[tryString] = value
+		return nil
+	}
+
+	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
+		return e
+	}
+
+	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
+	if e == nil {
+		tryString, e = asString(keys, keys[len(keys)-1])
+		if e != nil {
+			return e
+		}
+
+		parentMap[tryString] = value
+		return j.Set(parentMap, keys[0:len(keys)-1]...)
+	}
+
+	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
+	if e == nil {
+		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
+			return e
+		}
+
+		parentArr[tryInt] = value
+		return j.Set(parentArr, keys[0:len(keys)-1]...)
+	}
+
+	return fmt.Errorf("Key %v not found", keys)
 }
 
 // SetBlob will replace the underlying map[string]interface{} with a

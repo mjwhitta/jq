@@ -116,6 +116,27 @@ func main() {
 
     keys = j.GetKeys("e", "more")
     fmt.Println(keys)
+
+    // Set keys
+    if e = j.Set(false, "asdf", "test"); e != nil {
+        fmt.Println(e.Error())
+    }
+    j.Set(false, "asdf")
+
+    j.Set(false, "a")
+
+    if e = j.Set("asdf", "d", "asdf"); e != nil {
+        fmt.Println(e.Error())
+    }
+    j.Set("asdf", "d", 1)
+
+    if e = j.Set(17, "e", 0); e != nil {
+        fmt.Println(e.Error())
+    }
+    j.Set(17, "e", "anInt")
+    j.Set(19, "e", "more", "anInt64")
+
+    fmt.Println(j.String())
 }
 ```
 
