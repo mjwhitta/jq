@@ -31,61 +31,73 @@ generate_funcs() {
         "") ;;
         "bool")
             cat <<EOF
-func as${type^}(v interface{}) ($type, error) {
+func as${type^}(
+    keys []interface{},
+    v interface{},
+) (ret $type, e error) {
     switch v.(type) {
     case $type:
-        return v.($type), nil
+        ret = v.($type)
     default:
-        return false, fmt.Errorf("Not a $type")
+        e = fmt.Errorf("Key %v is not a $type", keys)
     }
+    return
 }
 
 EOF
             ;;
         "float"*|"int"*|"uint"*)
             cat <<EOF
-func as${type^}(v interface{}) ($type, error) {
+func as${type^}(
+    keys []interface{},
+    v interface{},
+) (ret $type, e error) {
     switch v.(type) {
     case float64:
-        return $type(v.(float64)), nil
+        ret = $type(v.(float64))
     case float32:
-        return $type(v.(float32)), nil
+        ret = $type(v.(float32))
     case int64:
-        return $type(v.(int64)), nil
+        ret = $type(v.(int64))
     case int32:
-        return $type(v.(int32)), nil
+        ret = $type(v.(int32))
     case int16:
-        return $type(v.(int16)), nil
+        ret = $type(v.(int16))
     case int8:
-        return $type(v.(int8)), nil
+        ret = $type(v.(int8))
     case int:
-        return $type(v.(int)), nil
+        ret = $type(v.(int))
     case uint64:
-        return $type(v.(uint64)), nil
+        ret = $type(v.(uint64))
     case uint32:
-        return $type(v.(uint32)), nil
+        ret = $type(v.(uint32))
     case uint16:
-        return $type(v.(uint16)), nil
+        ret = $type(v.(uint16))
     case uint8:
-        return $type(v.(uint8)), nil
+        ret = $type(v.(uint8))
     case uint:
-        return $type(v.(uint)), nil
+        ret = $type(v.(uint))
     default:
-        return 0, fmt.Errorf("Not a ${type}")
+        e = fmt.Errorf("Key %v is not a $type", keys)
     }
+    return
 }
 
 EOF
             ;;
         "string")
             cat <<EOF
-func as${type^}(v interface{}) ($type, error) {
+func as${type^}(
+    keys []interface{},
+    v interface{},
+) (ret $type, e error) {
     switch v.(type) {
     case $type:
-        return v.($type), nil
+        ret = v.($type)
     default:
-        return "", fmt.Errorf("Not a ${type}")
+        e = fmt.Errorf("Key %v is not a $type", keys)
     }
+    return
 }
 
 EOF
@@ -96,53 +108,70 @@ EOF
         "")
             cat <<EOF
 // Get will return the value for the specified key(s) as a $rtype.
-func (j *JSON) Get(key ...interface{}) ($rtype, error) {
-    var e error
-    var val interface{}
-
-    if val, e = j.nestedGetKey(key); e != nil {
-        return nil, e
-    }
-
-    return val, nil
+func (j *JSON) Get(keys ...interface{}) (ret $rtype) {
+    ret, _ = j.MustGet(keys...)
+    return
 }
 
 // GetArray will return an array for the specified key(s) as an
 // []$rtype.
-func (j *JSON) GetArray(key ...interface{}) ([]$rtype, error) {
-    var e error
-    var ok bool
-    var ret []$rtype
-    var val interface{}
-
-    if val, e = j.nestedGetKey(key); e != nil {
-        return ret, e
-    }
-
-    if ret, ok = val.([]$rtype); !ok {
-        return ret, fmt.Errorf("Not a []$rtype")
-    }
-
-    return ret, nil
+func (j *JSON) GetArray(keys ...interface{}) (ret []$rtype) {
+    ret, _ = j.MustGetArray(keys...)
+    return
 }
 
 // GetMap will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) GetMap(key ...interface{}) (map[string]$rtype, error) {
-    var e error
+func (j *JSON) GetMap(keys ...interface{}) (ret map[string]$rtype) {
+    ret, _ = j.MustGetMap(keys...)
+    return
+}
+
+// MustGet will return the value for the specified key(s) as a $rtype.
+func (j *JSON) MustGet(keys ...interface{}) ($rtype, error) {
+    return j.nestedGetKey(keys)
+}
+
+// MustGetArray will return an array for the specified key(s) as an
+// []$rtype.
+func (j *JSON) MustGetArray(
+    keys ...interface{},
+) (ret []$rtype, e error) {
     var ok bool
-    var ret = map[string]$rtype{}
     var val interface{}
 
-    if val, e = j.nestedGetKey(key); e != nil {
+    if val, e = j.nestedGetKey(keys); e != nil {
         return ret, e
     }
 
-    if ret, ok = val.(map[string]$rtype); !ok {
-        return ret, fmt.Errorf("Not a map[string]$rtype")
+    if ret, ok = val.([]$rtype); !ok {
+        e = fmt.Errorf("Not a []$rtype")
+        return
     }
 
-    return ret, nil
+    return
+}
+
+// MustGetMap will return a map for the specified key(s) as a
+// map[string]$rtype.
+func (j *JSON) MustGetMap(
+    keys ...interface{},
+) (ret map[string]$rtype, e error) {
+    var ok bool
+    var val interface{}
+
+    ret = map[string]$rtype{}
+
+    if val, e = j.nestedGetKey(keys); e != nil {
+        return
+    }
+
+    if ret, ok = val.(map[string]$rtype); !ok {
+        e = fmt.Errorf("Not a map[string]$rtype")
+        return
+    }
+
+    return
 }
 
 EOF
@@ -151,72 +180,98 @@ EOF
             cat <<EOF
 // Get${type^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) Get${type^}(key ...interface{}) ($rtype, error) {
-    var e error
-    var ret $rtype
-    var val interface{}
-
-    if val, e = j.nestedGetKey(key); e != nil {
-        return ret, e
-    }
-
-    return as${type^}(val)
+func (j *JSON) Get${type^}(keys ...interface{}) (ret $rtype) {
+    ret, _ = j.MustGet${type^}(keys...)
+    return
 }
 
 // Get${type^}Array will return an array for the specified key(s) as a
 // []$rtype.
-func (j *JSON) Get${type^}Array(
-    key ...interface{},
-) ([]$rtype, error) {
-    var e error
-    var ok bool
-    var ret = []$rtype{}
-    var tmp $rtype
-    var val interface{}
-
-    if val, e = j.nestedGetKey(key); e != nil {
-        return ret, e
-    }
-
-    if _, ok = val.([]$rtype); ok {
-        return val.([]$rtype), nil
-    }
-
-    for _, v := range val.([]interface{}) {
-        if tmp, e = as${type^}(v); e != nil {
-            return []$rtype{}, e
-        }
-        ret = append(ret, tmp)
-    }
-
-    return ret, nil
+func (j *JSON) Get${type^}Array(keys ...interface{}) (ret []$rtype) {
+    ret, _ = j.MustGet${type^}Array(keys...)
+    return
 }
 
 // Get${type^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
 func (j *JSON) Get${type^}Map(
-    key ...interface{},
-) (map[string]$rtype, error) {
-    var e error
-    var ok bool
-    var ret = map[string]$rtype{}
+    keys ...interface{},
+) (ret map[string]$rtype) {
+    ret, _ = j.MustGet${type^}Map(keys...)
+    return
+}
+
+// MustGet${type^} will return the value for the specified key(s) as a
+// $rtype.
+func (j *JSON) MustGet${type^}(
+    keys ...interface{},
+) (ret $rtype, e error) {
     var val interface{}
 
-    if val, e = j.nestedGetKey(key); e != nil {
-        return ret, e
+    if val, e = j.nestedGetKey(keys); e != nil {
+        return
+    }
+
+    ret, e = as${type^}(keys, val)
+    return
+}
+
+// MustGet${type^}Array will return an array for the specified key(s)
+// as a []$rtype.
+func (j *JSON) MustGet${type^}Array(
+    keys ...interface{},
+) (ret []$rtype, e error) {
+    var ok bool
+    var tmp $rtype
+    var val interface{}
+
+    if val, e = j.nestedGetKey(keys); e != nil {
+        return
+    }
+
+    if _, ok = val.([]$rtype); ok {
+        ret = val.([]$rtype)
+        return
+    }
+
+    for _, v := range val.([]interface{}) {
+        if tmp, e = as${type^}(keys, v); e != nil {
+            ret = []$rtype{}
+            return
+        }
+        ret = append(ret, tmp)
+    }
+
+    return
+}
+
+// MustGet${type^}Map will return a map for the specified key(s) as a
+// map[string]$rtype.
+func (j *JSON) MustGet${type^}Map(
+    keys ...interface{},
+) (ret map[string]$rtype, e error) {
+    var ok bool
+    var val interface{}
+
+    ret = map[string]$rtype{}
+
+    if val, e = j.nestedGetKey(keys); e != nil {
+        return
     }
 
     if _, ok = val.(map[string]$rtype); ok {
-        return val.(map[string]$rtype), nil
+        ret = val.(map[string]$rtype)
+        return
     }
 
     for k, v := range val.(map[string]interface{}) {
-        if ret[k], e = as${type^}(v); e != nil {
-            return map[string]$rtype{}, e
+        if ret[k], e = as${type^}(keys, v); e != nil {
+            ret = map[string]$rtype{}
+            return
         }
     }
 
-    return ret, nil
+    return
 }
 
 EOF

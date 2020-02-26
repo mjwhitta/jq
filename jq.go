@@ -66,47 +66,50 @@ func (j *JSON) GetBlobIndent(
 
 // GetKeys will return a list of valid keys if the specified key
 // returns an array or map.
-func (j *JSON) GetKeys(key ...interface{}) ([]string, error) {
+func (j *JSON) GetKeys(keys ...interface{}) (ret []string) {
+	ret, _ = j.MustGetKeys(keys...)
+	return
+}
+
+// HasKey will return true if the JSON blob has the specified key,
+// false otherwise.
+func (j *JSON) HasKey(keys ...interface{}) bool {
 	var e error
-	var keys []string
+	_, e = j.nestedGetKey(keys)
+	return (e == nil)
+}
+
+// MustGetKeys will return a list of valid keys if the specified key
+// returns an array or map.
+func (j *JSON) MustGetKeys(
+	keys ...interface{},
+) (ret []string, e error) {
 	var less = func(i, j int) bool {
-		return (strings.ToLower(keys[i]) < strings.ToLower(keys[j]))
+		return (strings.ToLower(ret[i]) < strings.ToLower(ret[j]))
 	}
 	var val interface{}
 
-	if val, e = j.nestedGetKey(key); e != nil {
-		return keys, e
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
 	}
 
 	switch val.(type) {
 	case []interface{}:
 		for i := 0; i < len(val.([]interface{})); i++ {
-			keys = append(keys, strconv.Itoa(i))
+			ret = append(ret, strconv.Itoa(i))
 		}
-		return keys, nil
 	case map[string]interface{}:
 		for k := range val.(map[string]interface{}) {
-			keys = append(keys, k)
+			ret = append(ret, k)
 		}
 
-		if !sort.SliceIsSorted(keys, less) {
-			sort.SliceStable(keys, less)
+		if !sort.SliceIsSorted(ret, less) {
+			sort.SliceStable(ret, less)
 		}
-
-		return keys, nil
 	default:
-		return keys, fmt.Errorf("Key %v has no valid keys", key)
+		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
 	}
-}
-
-// HasKey will return true if the JSON blob has the specified key,
-// false otherwise.
-func (j *JSON) HasKey(key ...interface{}) bool {
-	var e error
-
-	_, e = j.nestedGetKey(key)
-
-	return (e == nil)
+	return
 }
 
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
@@ -117,14 +120,14 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 	var val interface{} = j.blob
 
 	for _, key := range keys {
-		if tryString, e = asString(key); e == nil {
+		if tryString, e = asString(keys, key); e == nil {
 			v = val.(map[string]interface{})[tryString]
-		} else if tryInt, e = asInt(key); e == nil {
+		} else if tryInt, e = asInt(keys, key); e == nil {
 			v = val.([]interface{})[tryInt]
 		}
 
 		if (e != nil) || (v == nil) {
-			return nil, fmt.Errorf("key %v not found", keys)
+			return nil, fmt.Errorf("Key %v not found", keys)
 		}
 
 		val = v
