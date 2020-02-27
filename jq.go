@@ -34,6 +34,11 @@ func (j *JSON) Append(value interface{}, keys ...interface{}) error {
 	return j.Set(append(parent, value), keys...)
 }
 
+// Clear will reset the JSON blob to {}.
+func (j *JSON) Clear() {
+	j.blob = map[string]interface{}{}
+}
+
 // GetBlob will return the JSON blob as a string. An indentation
 // string and a prefix string are accepted as optionally parameters.
 func (j *JSON) GetBlob(params ...string) (ret string, e error) {
@@ -195,6 +200,8 @@ func (j *JSON) SetBlob(blob ...string) (e error) {
 	if len(blobStr) == 0 {
 		blobStr = "{}"
 	}
+
+	j.blob = map[string]interface{}{}
 
 	dec = json.NewDecoder(strings.NewReader(blobStr))
 	e = dec.Decode(&j.blob)

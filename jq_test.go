@@ -404,4 +404,18 @@ func TestSet(t *testing.T) {
 	if actual != expected {
 		t.Errorf("got: %s; want: %s", actual, expected)
 	}
+
+	if e = j.SetBlob("{\"asdf\": false}"); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	if e = j.SetBlob("{\"blah\": false}"); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	actual = fmt.Sprintf("%+v", j.GetMap())
+	expected = "map[blah:false]"
+	if actual != expected {
+		t.Errorf("got: %s; want: %s", actual, expected)
+	}
 }
