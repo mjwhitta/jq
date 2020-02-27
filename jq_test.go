@@ -63,9 +63,33 @@ func TestAppend(t *testing.T) {
 func TestBadJSON(t *testing.T) {
 	var e error
 	var expected string
+	var j *jq.JSON
 
-	expected = "EOF"
-	if _, e = jq.New(""); e == nil {
+	expected = "invalid character '}' looking for beginning of value"
+	if _, e = jq.New("}"); e == nil {
+		t.Errorf("got: nil; want: %s", expected)
+	} else if e.Error() != expected {
+		t.Errorf("got: %s; want: %s", e.Error(), expected)
+	}
+
+	expected = "unexpected EOF"
+	if _, e = jq.New("{"); e == nil {
+		t.Errorf("got: nil; want: %s", expected)
+	} else if e.Error() != expected {
+		t.Errorf("got: %s; want: %s", e.Error(), expected)
+	}
+
+	j, _ = jq.New()
+
+	expected = "invalid character '}' looking for beginning of value"
+	if e = j.SetBlob("}"); e == nil {
+		t.Errorf("got: nil; want: %s", expected)
+	} else if e.Error() != expected {
+		t.Errorf("got: %s; want: %s", e.Error(), expected)
+	}
+
+	expected = "unexpected EOF"
+	if e = j.SetBlob("{"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
 		t.Errorf("got: %s; want: %s", e.Error(), expected)
@@ -266,6 +290,7 @@ func TestGetStringArray(t *testing.T) {
 
 func TestGoodJSON(t *testing.T) {
 	var e error
+	var j *jq.JSON
 
 	if _, e = jq.New(json); e != nil {
 		t.Errorf("got: %s; want: nil", e.Error())
@@ -275,7 +300,11 @@ func TestGoodJSON(t *testing.T) {
 		t.Errorf("got: %s; want: nil", e.Error())
 	}
 
-	if _, e = jq.New(); e != nil {
+	if j, e = jq.New(); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	if e = j.SetBlob(); e != nil {
 		t.Errorf("got: %s; want: nil", e.Error())
 	}
 }

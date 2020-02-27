@@ -17,9 +17,7 @@ type JSON struct {
 // New is a JSON constructor.
 func New(blob ...string) (j *JSON, e error) {
 	j = &JSON{blob: map[string]interface{}{}, escape: false}
-	if len(blob) > 0 {
-		e = j.SetBlob(strings.Join(blob, ""))
-	}
+	e = j.SetBlob(strings.Join(blob, ""))
 	return
 }
 
@@ -190,10 +188,15 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 
 // SetBlob will replace the underlying map[string]interface{} with a
 // new JSON blob.
-func (j *JSON) SetBlob(blob string) (e error) {
+func (j *JSON) SetBlob(blob ...string) (e error) {
+	var blobStr = strings.TrimSpace(strings.Join(blob, ""))
 	var dec *json.Decoder
 
-	dec = json.NewDecoder(strings.NewReader(strings.TrimSpace(blob)))
+	if len(blobStr) == 0 {
+		blobStr = "{}"
+	}
+
+	dec = json.NewDecoder(strings.NewReader(blobStr))
 	e = dec.Decode(&j.blob)
 
 	return
