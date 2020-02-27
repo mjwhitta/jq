@@ -21,6 +21,19 @@ func New(blob string) (j *JSON, e error) {
 	return
 }
 
+// Append will append the specified value to the specified key in the
+// JSON blob, if it is an array.
+func (j *JSON) Append(value interface{}, keys ...interface{}) error {
+	var e error
+	var parent []interface{}
+
+	if parent, e = j.MustGetArray(keys...); e != nil {
+		return e
+	}
+
+	return j.Set(append(parent, value), keys...)
+}
+
 // GetBlob will return the JSON blob as a string. An indentation
 // string and a prefix string are accepted as optionally parameters.
 func (j *JSON) GetBlob(params ...string) (ret string, e error) {
@@ -129,7 +142,13 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 	var tryString string
 
 	if len(keys) == 0 {
-		return nil
+		switch value.(type) {
+		case map[string]interface{}:
+			j.blob = value.(map[string]interface{})
+			return nil
+		default:
+			return fmt.Errorf("Value is not a map[string]interface{}")
+		}
 	} else if len(keys) == 1 {
 		if tryString, e = asString(keys, keys[0]); e != nil {
 			return e

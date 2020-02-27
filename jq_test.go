@@ -31,6 +31,35 @@ var json string = strings.Join(
 	"\n",
 )
 
+func TestAppend(t *testing.T) {
+	var actual string
+	var e error
+	var expected string
+	var j *jq.JSON
+
+	j, _ = jq.New(json)
+
+	if e = j.Append("asdf", "d"); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	expected = "[blah test asdf]"
+	actual = fmt.Sprintf("%v", j.GetArray("d"))
+	if actual != expected {
+		t.Errorf("got: %s; want: %s", actual, expected)
+	}
+
+	if e = j.Append(2, "d"); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	expected = "[blah test asdf 2]"
+	actual = fmt.Sprintf("%v", j.GetArray("d"))
+	if actual != expected {
+		t.Errorf("got: %s; want: %s", actual, expected)
+	}
+}
+
 func TestBadJSON(t *testing.T) {
 	var e error
 	var expected string
@@ -294,6 +323,7 @@ func TestSet(t *testing.T) {
 	var e error
 	var expected string
 	var j *jq.JSON
+	var newMap = map[string]interface{}{}
 
 	j, _ = jq.New(json)
 
@@ -323,5 +353,18 @@ func TestSet(t *testing.T) {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
 		t.Errorf("got: %s; want: %s", e.Error(), expected)
+	}
+
+	newMap = map[string]interface{}{"asdf": "blah", "anInt": 7}
+
+	e = j.Set(newMap)
+	if e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	actual = fmt.Sprintf("%+v", j.GetMap())
+	expected = fmt.Sprintf("%+v", newMap)
+	if actual != expected {
+		t.Errorf("got: %s; want: %s", actual, expected)
 	}
 }
