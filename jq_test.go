@@ -270,6 +270,14 @@ func TestGoodJSON(t *testing.T) {
 	if _, e = jq.New(json); e != nil {
 		t.Errorf("got: %s; want: nil", e.Error())
 	}
+
+	if _, e = jq.New(strings.Fields(json)...); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
+
+	if _, e = jq.New(); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	}
 }
 
 func TestHasKey(t *testing.T) {

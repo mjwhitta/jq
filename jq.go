@@ -15,9 +15,11 @@ type JSON struct {
 }
 
 // New is a JSON constructor.
-func New(blob string) (j *JSON, e error) {
+func New(blob ...string) (j *JSON, e error) {
 	j = &JSON{blob: map[string]interface{}{}, escape: false}
-	e = j.SetBlob(blob)
+	if len(blob) > 0 {
+		e = j.SetBlob(strings.Join(blob, ""))
+	}
 	return
 }
 
