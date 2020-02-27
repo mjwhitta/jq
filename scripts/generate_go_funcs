@@ -145,7 +145,7 @@ func (j *JSON) MustGetArray(
     }
 
     if ret, ok = val.([]$rtype); !ok {
-        e = fmt.Errorf("Not a []$rtype")
+        e = fmt.Errorf("Key %v is not a []$rtype", keys)
         return
     }
 
@@ -167,7 +167,7 @@ func (j *JSON) MustGetMap(
     }
 
     if ret, ok = val.(map[string]$rtype); !ok {
-        e = fmt.Errorf("Not a map[string]$rtype")
+        e = fmt.Errorf("Key %v is not a map[string]$rtype", keys)
         return
     }
 
@@ -221,7 +221,6 @@ func (j *JSON) MustGet${type^}(
 func (j *JSON) MustGet${type^}Array(
     keys ...interface{},
 ) (ret []$rtype, e error) {
-    var ok bool
     var tmp $rtype
     var val interface{}
 
@@ -229,8 +228,13 @@ func (j *JSON) MustGet${type^}Array(
         return
     }
 
-    if _, ok = val.([]$rtype); ok {
+    if _, ok := val.([]$rtype); ok {
         ret = val.([]$rtype)
+        return
+    }
+
+    if _, ok := val.([]interface{}); !ok {
+        e = fmt.Errorf("Key %v is not a []$rtype", keys)
         return
     }
 
@@ -250,7 +254,6 @@ func (j *JSON) MustGet${type^}Array(
 func (j *JSON) MustGet${type^}Map(
     keys ...interface{},
 ) (ret map[string]$rtype, e error) {
-    var ok bool
     var val interface{}
 
     ret = map[string]$rtype{}
@@ -259,7 +262,7 @@ func (j *JSON) MustGet${type^}Map(
         return
     }
 
-    if _, ok = val.(map[string]$rtype); ok {
+    if _, ok := val.(map[string]$rtype); ok {
         ret = val.(map[string]$rtype)
         return
     }

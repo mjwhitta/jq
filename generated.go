@@ -41,7 +41,7 @@ func (j *JSON) MustGetArray(
 	}
 
 	if ret, ok = val.([]interface{}); !ok {
-		e = fmt.Errorf("Not a []interface{}")
+		e = fmt.Errorf("Key %v is not a []interface{}", keys)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (j *JSON) MustGetMap(
 	}
 
 	if ret, ok = val.(map[string]interface{}); !ok {
-		e = fmt.Errorf("Not a map[string]interface{}")
+		e = fmt.Errorf("Key %v is not a map[string]interface{}", keys)
 		return
 	}
 
@@ -126,7 +126,6 @@ func (j *JSON) MustGetBool(
 func (j *JSON) MustGetBoolArray(
 	keys ...interface{},
 ) (ret []bool, e error) {
-	var ok bool
 	var tmp bool
 	var val interface{}
 
@@ -134,8 +133,13 @@ func (j *JSON) MustGetBoolArray(
 		return
 	}
 
-	if _, ok = val.([]bool); ok {
+	if _, ok := val.([]bool); ok {
 		ret = val.([]bool)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []bool", keys)
 		return
 	}
 
@@ -155,7 +159,6 @@ func (j *JSON) MustGetBoolArray(
 func (j *JSON) MustGetBoolMap(
 	keys ...interface{},
 ) (ret map[string]bool, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]bool{}
@@ -164,7 +167,7 @@ func (j *JSON) MustGetBoolMap(
 		return
 	}
 
-	if _, ok = val.(map[string]bool); ok {
+	if _, ok := val.(map[string]bool); ok {
 		ret = val.(map[string]bool)
 		return
 	}
@@ -257,7 +260,6 @@ func (j *JSON) MustGetFloat32(
 func (j *JSON) MustGetFloat32Array(
 	keys ...interface{},
 ) (ret []float32, e error) {
-	var ok bool
 	var tmp float32
 	var val interface{}
 
@@ -265,8 +267,13 @@ func (j *JSON) MustGetFloat32Array(
 		return
 	}
 
-	if _, ok = val.([]float32); ok {
+	if _, ok := val.([]float32); ok {
 		ret = val.([]float32)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []float32", keys)
 		return
 	}
 
@@ -286,7 +293,6 @@ func (j *JSON) MustGetFloat32Array(
 func (j *JSON) MustGetFloat32Map(
 	keys ...interface{},
 ) (ret map[string]float32, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]float32{}
@@ -295,7 +301,7 @@ func (j *JSON) MustGetFloat32Map(
 		return
 	}
 
-	if _, ok = val.(map[string]float32); ok {
+	if _, ok := val.(map[string]float32); ok {
 		ret = val.(map[string]float32)
 		return
 	}
@@ -388,7 +394,6 @@ func (j *JSON) MustGetFloat64(
 func (j *JSON) MustGetFloat64Array(
 	keys ...interface{},
 ) (ret []float64, e error) {
-	var ok bool
 	var tmp float64
 	var val interface{}
 
@@ -396,8 +401,13 @@ func (j *JSON) MustGetFloat64Array(
 		return
 	}
 
-	if _, ok = val.([]float64); ok {
+	if _, ok := val.([]float64); ok {
 		ret = val.([]float64)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []float64", keys)
 		return
 	}
 
@@ -417,7 +427,6 @@ func (j *JSON) MustGetFloat64Array(
 func (j *JSON) MustGetFloat64Map(
 	keys ...interface{},
 ) (ret map[string]float64, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]float64{}
@@ -426,7 +435,7 @@ func (j *JSON) MustGetFloat64Map(
 		return
 	}
 
-	if _, ok = val.(map[string]float64); ok {
+	if _, ok := val.(map[string]float64); ok {
 		ret = val.(map[string]float64)
 		return
 	}
@@ -519,7 +528,6 @@ func (j *JSON) MustGetInt(
 func (j *JSON) MustGetIntArray(
 	keys ...interface{},
 ) (ret []int, e error) {
-	var ok bool
 	var tmp int
 	var val interface{}
 
@@ -527,8 +535,13 @@ func (j *JSON) MustGetIntArray(
 		return
 	}
 
-	if _, ok = val.([]int); ok {
+	if _, ok := val.([]int); ok {
 		ret = val.([]int)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []int", keys)
 		return
 	}
 
@@ -548,7 +561,6 @@ func (j *JSON) MustGetIntArray(
 func (j *JSON) MustGetIntMap(
 	keys ...interface{},
 ) (ret map[string]int, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]int{}
@@ -557,7 +569,7 @@ func (j *JSON) MustGetIntMap(
 		return
 	}
 
-	if _, ok = val.(map[string]int); ok {
+	if _, ok := val.(map[string]int); ok {
 		ret = val.(map[string]int)
 		return
 	}
@@ -650,7 +662,6 @@ func (j *JSON) MustGetInt16(
 func (j *JSON) MustGetInt16Array(
 	keys ...interface{},
 ) (ret []int16, e error) {
-	var ok bool
 	var tmp int16
 	var val interface{}
 
@@ -658,8 +669,13 @@ func (j *JSON) MustGetInt16Array(
 		return
 	}
 
-	if _, ok = val.([]int16); ok {
+	if _, ok := val.([]int16); ok {
 		ret = val.([]int16)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []int16", keys)
 		return
 	}
 
@@ -679,7 +695,6 @@ func (j *JSON) MustGetInt16Array(
 func (j *JSON) MustGetInt16Map(
 	keys ...interface{},
 ) (ret map[string]int16, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]int16{}
@@ -688,7 +703,7 @@ func (j *JSON) MustGetInt16Map(
 		return
 	}
 
-	if _, ok = val.(map[string]int16); ok {
+	if _, ok := val.(map[string]int16); ok {
 		ret = val.(map[string]int16)
 		return
 	}
@@ -781,7 +796,6 @@ func (j *JSON) MustGetInt32(
 func (j *JSON) MustGetInt32Array(
 	keys ...interface{},
 ) (ret []int32, e error) {
-	var ok bool
 	var tmp int32
 	var val interface{}
 
@@ -789,8 +803,13 @@ func (j *JSON) MustGetInt32Array(
 		return
 	}
 
-	if _, ok = val.([]int32); ok {
+	if _, ok := val.([]int32); ok {
 		ret = val.([]int32)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []int32", keys)
 		return
 	}
 
@@ -810,7 +829,6 @@ func (j *JSON) MustGetInt32Array(
 func (j *JSON) MustGetInt32Map(
 	keys ...interface{},
 ) (ret map[string]int32, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]int32{}
@@ -819,7 +837,7 @@ func (j *JSON) MustGetInt32Map(
 		return
 	}
 
-	if _, ok = val.(map[string]int32); ok {
+	if _, ok := val.(map[string]int32); ok {
 		ret = val.(map[string]int32)
 		return
 	}
@@ -912,7 +930,6 @@ func (j *JSON) MustGetInt64(
 func (j *JSON) MustGetInt64Array(
 	keys ...interface{},
 ) (ret []int64, e error) {
-	var ok bool
 	var tmp int64
 	var val interface{}
 
@@ -920,8 +937,13 @@ func (j *JSON) MustGetInt64Array(
 		return
 	}
 
-	if _, ok = val.([]int64); ok {
+	if _, ok := val.([]int64); ok {
 		ret = val.([]int64)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []int64", keys)
 		return
 	}
 
@@ -941,7 +963,6 @@ func (j *JSON) MustGetInt64Array(
 func (j *JSON) MustGetInt64Map(
 	keys ...interface{},
 ) (ret map[string]int64, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]int64{}
@@ -950,7 +971,7 @@ func (j *JSON) MustGetInt64Map(
 		return
 	}
 
-	if _, ok = val.(map[string]int64); ok {
+	if _, ok := val.(map[string]int64); ok {
 		ret = val.(map[string]int64)
 		return
 	}
@@ -1021,7 +1042,6 @@ func (j *JSON) MustGetString(
 func (j *JSON) MustGetStringArray(
 	keys ...interface{},
 ) (ret []string, e error) {
-	var ok bool
 	var tmp string
 	var val interface{}
 
@@ -1029,8 +1049,13 @@ func (j *JSON) MustGetStringArray(
 		return
 	}
 
-	if _, ok = val.([]string); ok {
+	if _, ok := val.([]string); ok {
 		ret = val.([]string)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []string", keys)
 		return
 	}
 
@@ -1050,7 +1075,6 @@ func (j *JSON) MustGetStringArray(
 func (j *JSON) MustGetStringMap(
 	keys ...interface{},
 ) (ret map[string]string, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]string{}
@@ -1059,7 +1083,7 @@ func (j *JSON) MustGetStringMap(
 		return
 	}
 
-	if _, ok = val.(map[string]string); ok {
+	if _, ok := val.(map[string]string); ok {
 		ret = val.(map[string]string)
 		return
 	}
@@ -1152,7 +1176,6 @@ func (j *JSON) MustGetUint(
 func (j *JSON) MustGetUintArray(
 	keys ...interface{},
 ) (ret []uint, e error) {
-	var ok bool
 	var tmp uint
 	var val interface{}
 
@@ -1160,8 +1183,13 @@ func (j *JSON) MustGetUintArray(
 		return
 	}
 
-	if _, ok = val.([]uint); ok {
+	if _, ok := val.([]uint); ok {
 		ret = val.([]uint)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []uint", keys)
 		return
 	}
 
@@ -1181,7 +1209,6 @@ func (j *JSON) MustGetUintArray(
 func (j *JSON) MustGetUintMap(
 	keys ...interface{},
 ) (ret map[string]uint, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]uint{}
@@ -1190,7 +1217,7 @@ func (j *JSON) MustGetUintMap(
 		return
 	}
 
-	if _, ok = val.(map[string]uint); ok {
+	if _, ok := val.(map[string]uint); ok {
 		ret = val.(map[string]uint)
 		return
 	}
@@ -1283,7 +1310,6 @@ func (j *JSON) MustGetUint16(
 func (j *JSON) MustGetUint16Array(
 	keys ...interface{},
 ) (ret []uint16, e error) {
-	var ok bool
 	var tmp uint16
 	var val interface{}
 
@@ -1291,8 +1317,13 @@ func (j *JSON) MustGetUint16Array(
 		return
 	}
 
-	if _, ok = val.([]uint16); ok {
+	if _, ok := val.([]uint16); ok {
 		ret = val.([]uint16)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []uint16", keys)
 		return
 	}
 
@@ -1312,7 +1343,6 @@ func (j *JSON) MustGetUint16Array(
 func (j *JSON) MustGetUint16Map(
 	keys ...interface{},
 ) (ret map[string]uint16, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]uint16{}
@@ -1321,7 +1351,7 @@ func (j *JSON) MustGetUint16Map(
 		return
 	}
 
-	if _, ok = val.(map[string]uint16); ok {
+	if _, ok := val.(map[string]uint16); ok {
 		ret = val.(map[string]uint16)
 		return
 	}
@@ -1414,7 +1444,6 @@ func (j *JSON) MustGetUint32(
 func (j *JSON) MustGetUint32Array(
 	keys ...interface{},
 ) (ret []uint32, e error) {
-	var ok bool
 	var tmp uint32
 	var val interface{}
 
@@ -1422,8 +1451,13 @@ func (j *JSON) MustGetUint32Array(
 		return
 	}
 
-	if _, ok = val.([]uint32); ok {
+	if _, ok := val.([]uint32); ok {
 		ret = val.([]uint32)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []uint32", keys)
 		return
 	}
 
@@ -1443,7 +1477,6 @@ func (j *JSON) MustGetUint32Array(
 func (j *JSON) MustGetUint32Map(
 	keys ...interface{},
 ) (ret map[string]uint32, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]uint32{}
@@ -1452,7 +1485,7 @@ func (j *JSON) MustGetUint32Map(
 		return
 	}
 
-	if _, ok = val.(map[string]uint32); ok {
+	if _, ok := val.(map[string]uint32); ok {
 		ret = val.(map[string]uint32)
 		return
 	}
@@ -1545,7 +1578,6 @@ func (j *JSON) MustGetUint64(
 func (j *JSON) MustGetUint64Array(
 	keys ...interface{},
 ) (ret []uint64, e error) {
-	var ok bool
 	var tmp uint64
 	var val interface{}
 
@@ -1553,8 +1585,13 @@ func (j *JSON) MustGetUint64Array(
 		return
 	}
 
-	if _, ok = val.([]uint64); ok {
+	if _, ok := val.([]uint64); ok {
 		ret = val.([]uint64)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []uint64", keys)
 		return
 	}
 
@@ -1574,7 +1611,6 @@ func (j *JSON) MustGetUint64Array(
 func (j *JSON) MustGetUint64Map(
 	keys ...interface{},
 ) (ret map[string]uint64, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]uint64{}
@@ -1583,7 +1619,7 @@ func (j *JSON) MustGetUint64Map(
 		return
 	}
 
-	if _, ok = val.(map[string]uint64); ok {
+	if _, ok := val.(map[string]uint64); ok {
 		ret = val.(map[string]uint64)
 		return
 	}

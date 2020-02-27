@@ -15,53 +15,36 @@ type JSON struct {
 }
 
 // New is a JSON constructor.
-func New(blob string) (*JSON, error) {
-	var dec *json.Decoder
-	var e error
-	var j = &JSON{blob: map[string]interface{}{}, escape: false}
-
-	dec = json.NewDecoder(strings.NewReader(strings.TrimSpace(blob)))
-
-	if e = dec.Decode(&j.blob); e != nil {
-		return j, e
-	}
-
-	return j, nil
+func New(blob string) (j *JSON, e error) {
+	j = &JSON{blob: map[string]interface{}{}, escape: false}
+	e = j.SetBlob(blob)
+	return
 }
 
-// GetBlob will return the JSON blob as a string.
-func (j *JSON) GetBlob() (string, error) {
+// GetBlob will return the JSON blob as a string. An indentation
+// string and a prefix string are accepted as optionally parameters.
+func (j *JSON) GetBlob(params ...string) (ret string, e error) {
 	var blob = &strings.Builder{}
-	var e error
 	var enc *json.Encoder = json.NewEncoder(blob)
+	var indent string
+	var pre string
 
-	enc.SetEscapeHTML(j.escape)
-
-	if e = enc.Encode(j.blob); e != nil {
-		return "", e
+	if len(params) > 0 {
+		indent = params[0]
 	}
-
-	return strings.TrimSpace(blob.String()), nil
-}
-
-// GetBlobIndent will return the JSON blob as a string with the
-// specified prefix and indentation.
-func (j *JSON) GetBlobIndent(
-	pre string,
-	indent string,
-) (string, error) {
-	var blob = &strings.Builder{}
-	var e error
-	var enc *json.Encoder = json.NewEncoder(blob)
+	if len(params) > 1 {
+		pre = params[1]
+	}
 
 	enc.SetEscapeHTML(j.escape)
 	enc.SetIndent(pre, indent)
 
 	if e = enc.Encode(j.blob); e != nil {
-		return "", e
+		return
 	}
 
-	return strings.TrimSpace(blob.String()), nil
+	ret = strings.TrimSpace(blob.String())
+	return
 }
 
 // GetKeys will return a list of valid keys if the specified key
@@ -186,17 +169,13 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 
 // SetBlob will replace the underlying map[string]interface{} with a
 // new JSON blob.
-func (j *JSON) SetBlob(blob string) error {
+func (j *JSON) SetBlob(blob string) (e error) {
 	var dec *json.Decoder
-	var e error
 
 	dec = json.NewDecoder(strings.NewReader(strings.TrimSpace(blob)))
+	e = dec.Decode(&j.blob)
 
-	if e = dec.Decode(&j.blob); e != nil {
-		return e
-	}
-
-	return nil
+	return
 }
 
 // SetEscapeHTML will set whether or not Marshalling should escape
@@ -206,8 +185,7 @@ func (j *JSON) SetEscapeHTML(escape bool) {
 }
 
 // String will return a string representation of JSON instance.
-func (j *JSON) String() string {
-	var str string
-	str, _ = j.GetBlobIndent("", "  ")
-	return str
+func (j *JSON) String() (ret string) {
+	ret, _ = j.GetBlob("  ")
+	return
 }
