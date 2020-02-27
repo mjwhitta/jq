@@ -3,8 +3,6 @@ package jq
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -80,39 +78,6 @@ func (j *JSON) HasKey(keys ...interface{}) bool {
 	return (e == nil)
 }
 
-// MustGetKeys will return a list of valid keys if the specified key
-// returns an array or map.
-func (j *JSON) MustGetKeys(
-	keys ...interface{},
-) (ret []string, e error) {
-	var less = func(i, j int) bool {
-		return (strings.ToLower(ret[i]) < strings.ToLower(ret[j]))
-	}
-	var val interface{}
-
-	if val, e = j.nestedGetKey(keys); e != nil {
-		return
-	}
-
-	switch val.(type) {
-	case []interface{}:
-		for i := 0; i < len(val.([]interface{})); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]interface{}:
-		for k := range val.(map[string]interface{}) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	default:
-		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
-	}
-	return
-}
-
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 	var e error
 	var tryInt int
@@ -135,60 +100,6 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 	}
 
 	return val, nil
-}
-
-// Set will set the specified value for the specified key in the JSON
-// blob.
-func (j *JSON) Set(value interface{}, keys ...interface{}) error {
-	var e error
-	var parentArr []interface{}
-	var parentMap = map[string]interface{}{}
-	var tryInt int
-	var tryString string
-
-	if len(keys) == 0 {
-		switch value.(type) {
-		case map[string]interface{}:
-			j.blob = value.(map[string]interface{})
-			return nil
-		default:
-			return fmt.Errorf("Value is not a map[string]interface{}")
-		}
-	} else if len(keys) == 1 {
-		if tryString, e = asString(keys, keys[0]); e != nil {
-			return e
-		}
-
-		j.blob[tryString] = value
-		return nil
-	}
-
-	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
-		return e
-	}
-
-	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
-	if e == nil {
-		tryString, e = asString(keys, keys[len(keys)-1])
-		if e != nil {
-			return e
-		}
-
-		parentMap[tryString] = value
-		return j.Set(parentMap, keys[0:len(keys)-1]...)
-	}
-
-	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
-	if e == nil {
-		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
-			return e
-		}
-
-		parentArr[tryInt] = value
-		return j.Set(parentArr, keys[0:len(keys)-1]...)
-	}
-
-	return fmt.Errorf("Key %v not found", keys)
 }
 
 // SetBlob will replace the underlying map[string]interface{} with a

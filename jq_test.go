@@ -372,7 +372,8 @@ func TestKeys(t *testing.T) {
 	var expected string
 	var j *jq.JSON
 
-	j, _ = jq.New(json)
+	j, _ = jq.New()
+	j.Set(def)
 
 	actual = j.GetKeys("d")
 	expected = fmt.Sprintf("%v", []string{"0", "1"})
