@@ -8,6 +8,21 @@ import (
 	"gitlab.com/mjwhitta/jq"
 )
 
+var def = map[string]interface{}{
+	"a": true,
+	"b": "asdf",
+	"c": 1234,
+	"d": []string{"blah", "test"},
+	"e": map[string]interface{}{
+		"aFloat": 1.2,
+		"anInt":  17,
+		"more": map[string]interface{}{
+			"aFloat32": 1.2,
+			"anInt64":  19,
+		},
+	},
+}
+
 var json string = strings.Join(
 	[]string{
 		"{",
@@ -90,6 +105,34 @@ func TestBadJSON(t *testing.T) {
 
 	expected = "unexpected EOF"
 	if e = j.SetBlob("{"); e == nil {
+		t.Errorf("got: nil; want: %s", expected)
+	} else if e.Error() != expected {
+		t.Errorf("got: %s; want: %s", e.Error(), expected)
+	}
+}
+
+func TestGetArray(t *testing.T) {
+	var actual []interface{}
+	var expected string
+	var e error
+	var j *jq.JSON
+
+	j, _ = jq.New()
+	j.Set(def)
+
+	expected = fmt.Sprintf("%v", []string{"blah", "test"})
+	if actual, e = j.MustGetArray("d"); e != nil {
+		t.Errorf("got: %s; want: nil", e.Error())
+	} else if fmt.Sprintf("%v", actual) != expected {
+		t.Errorf("got: %v; want: %v", actual, expected)
+	}
+
+	if actual = j.GetArray("a"); len(actual) > 0 {
+		t.Errorf("got: %v; want: []", actual)
+	}
+
+	expected = "Key [a] is not a []interface{}"
+	if _, e = j.MustGetArray("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
 		t.Errorf("got: %s; want: %s", e.Error(), expected)

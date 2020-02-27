@@ -53,30 +53,20 @@ func as${type^}(
     v interface{},
 ) (ret $type, e error) {
     switch v.(type) {
-    case float64:
-        ret = $type(v.(float64))
-    case float32:
-        ret = $type(v.(float32))
-    case int64:
-        ret = $type(v.(int64))
-    case int32:
-        ret = $type(v.(int32))
-    case int16:
-        ret = $type(v.(int16))
-    case int8:
-        ret = $type(v.(int8))
-    case int:
-        ret = $type(v.(int))
-    case uint64:
-        ret = $type(v.(uint64))
-    case uint32:
-        ret = $type(v.(uint32))
-    case uint16:
-        ret = $type(v.(uint16))
-    case uint8:
-        ret = $type(v.(uint8))
-    case uint:
-        ret = $type(v.(uint))
+EOF
+
+    for realtype in \
+        float32 float64 \
+        int int16 int32 int64 \
+        uint uint16 uint32 uint64
+    do
+        cat <<EOF
+    case $realtype:
+        ret = $type(v.($realtype))
+EOF
+    done; unset maptype
+
+    cat <<EOF
     default:
         e = fmt.Errorf("Key %v is not a $type", keys)
     }
@@ -137,16 +127,35 @@ func (j *JSON) MustGet(keys ...interface{}) ($rtype, error) {
 func (j *JSON) MustGetArray(
     keys ...interface{},
 ) (ret []$rtype, e error) {
-    var ok bool
     var val interface{}
 
     if val, e = j.nestedGetKey(keys); e != nil {
         return ret, e
     }
 
-    if ret, ok = val.([]$rtype); !ok {
+    switch val.(type) {
+EOF
+
+    for arrtype in \
+        bool \
+        float32 float64 \
+        int int16 int32 int64 \
+        string \
+        uint uint16 uint32 uint64
+    do
+        cat <<EOF
+    case []$arrtype:
+        for _, v := range val.([]$arrtype) {
+            ret = append(ret, v)
+        }
+EOF
+    done; unset maptype
+
+    cat <<EOF
+    case []$rtype:
+        ret = val.([]$rtype)
+    default:
         e = fmt.Errorf("Key %v is not a []$rtype", keys)
-        return
     }
 
     return
@@ -157,7 +166,6 @@ func (j *JSON) MustGetArray(
 func (j *JSON) MustGetMap(
     keys ...interface{},
 ) (ret map[string]$rtype, e error) {
-    var ok bool
     var val interface{}
 
     ret = map[string]$rtype{}
@@ -166,9 +174,29 @@ func (j *JSON) MustGetMap(
         return
     }
 
-    if ret, ok = val.(map[string]$rtype); !ok {
+    switch val.(type) {
+EOF
+
+    for maptype in \
+        bool \
+        float32 float64 \
+        int int16 int32 int64 \
+        string \
+        uint uint16 uint32 uint64
+    do
+        cat <<EOF
+    case map[string]$maptype:
+        for k, v := range val.(map[string]$maptype) {
+            ret[k] = v
+        }
+EOF
+    done; unset maptype
+
+    cat <<EOF
+    case map[string]$rtype:
+        ret = val.(map[string]$rtype)
+    default:
         e = fmt.Errorf("Key %v is not a map[string]$rtype", keys)
-        return
     }
 
     return

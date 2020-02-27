@@ -33,16 +33,65 @@ func (j *JSON) MustGet(keys ...interface{}) (interface{}, error) {
 func (j *JSON) MustGetArray(
 	keys ...interface{},
 ) (ret []interface{}, e error) {
-	var ok bool
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return ret, e
 	}
 
-	if ret, ok = val.([]interface{}); !ok {
+	switch val.(type) {
+	case []bool:
+		for _, v := range val.([]bool) {
+			ret = append(ret, v)
+		}
+	case []float32:
+		for _, v := range val.([]float32) {
+			ret = append(ret, v)
+		}
+	case []float64:
+		for _, v := range val.([]float64) {
+			ret = append(ret, v)
+		}
+	case []int:
+		for _, v := range val.([]int) {
+			ret = append(ret, v)
+		}
+	case []int16:
+		for _, v := range val.([]int16) {
+			ret = append(ret, v)
+		}
+	case []int32:
+		for _, v := range val.([]int32) {
+			ret = append(ret, v)
+		}
+	case []int64:
+		for _, v := range val.([]int64) {
+			ret = append(ret, v)
+		}
+	case []string:
+		for _, v := range val.([]string) {
+			ret = append(ret, v)
+		}
+	case []uint:
+		for _, v := range val.([]uint) {
+			ret = append(ret, v)
+		}
+	case []uint16:
+		for _, v := range val.([]uint16) {
+			ret = append(ret, v)
+		}
+	case []uint32:
+		for _, v := range val.([]uint32) {
+			ret = append(ret, v)
+		}
+	case []uint64:
+		for _, v := range val.([]uint64) {
+			ret = append(ret, v)
+		}
+	case []interface{}:
+		ret = val.([]interface{})
+	default:
 		e = fmt.Errorf("Key %v is not a []interface{}", keys)
-		return
 	}
 
 	return
@@ -53,7 +102,6 @@ func (j *JSON) MustGetArray(
 func (j *JSON) MustGetMap(
 	keys ...interface{},
 ) (ret map[string]interface{}, e error) {
-	var ok bool
 	var val interface{}
 
 	ret = map[string]interface{}{}
@@ -62,9 +110,59 @@ func (j *JSON) MustGetMap(
 		return
 	}
 
-	if ret, ok = val.(map[string]interface{}); !ok {
+	switch val.(type) {
+	case map[string]bool:
+		for k, v := range val.(map[string]bool) {
+			ret[k] = v
+		}
+	case map[string]float32:
+		for k, v := range val.(map[string]float32) {
+			ret[k] = v
+		}
+	case map[string]float64:
+		for k, v := range val.(map[string]float64) {
+			ret[k] = v
+		}
+	case map[string]int:
+		for k, v := range val.(map[string]int) {
+			ret[k] = v
+		}
+	case map[string]int16:
+		for k, v := range val.(map[string]int16) {
+			ret[k] = v
+		}
+	case map[string]int32:
+		for k, v := range val.(map[string]int32) {
+			ret[k] = v
+		}
+	case map[string]int64:
+		for k, v := range val.(map[string]int64) {
+			ret[k] = v
+		}
+	case map[string]string:
+		for k, v := range val.(map[string]string) {
+			ret[k] = v
+		}
+	case map[string]uint:
+		for k, v := range val.(map[string]uint) {
+			ret[k] = v
+		}
+	case map[string]uint16:
+		for k, v := range val.(map[string]uint16) {
+			ret[k] = v
+		}
+	case map[string]uint32:
+		for k, v := range val.(map[string]uint32) {
+			ret[k] = v
+		}
+	case map[string]uint64:
+		for k, v := range val.(map[string]uint64) {
+			ret[k] = v
+		}
+	case map[string]interface{}:
+		ret = val.(map[string]interface{})
+	default:
 		e = fmt.Errorf("Key %v is not a map[string]interface{}", keys)
-		return
 	}
 
 	return
@@ -187,30 +285,26 @@ func asFloat32(
 	v interface{},
 ) (ret float32, e error) {
 	switch v.(type) {
-	case float64:
-		ret = float32(v.(float64))
 	case float32:
 		ret = float32(v.(float32))
-	case int64:
-		ret = float32(v.(int64))
-	case int32:
-		ret = float32(v.(int32))
-	case int16:
-		ret = float32(v.(int16))
-	case int8:
-		ret = float32(v.(int8))
+	case float64:
+		ret = float32(v.(float64))
 	case int:
 		ret = float32(v.(int))
-	case uint64:
-		ret = float32(v.(uint64))
-	case uint32:
-		ret = float32(v.(uint32))
-	case uint16:
-		ret = float32(v.(uint16))
-	case uint8:
-		ret = float32(v.(uint8))
+	case int16:
+		ret = float32(v.(int16))
+	case int32:
+		ret = float32(v.(int32))
+	case int64:
+		ret = float32(v.(int64))
 	case uint:
 		ret = float32(v.(uint))
+	case uint16:
+		ret = float32(v.(uint16))
+	case uint32:
+		ret = float32(v.(uint32))
+	case uint64:
+		ret = float32(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a float32", keys)
 	}
@@ -321,30 +415,26 @@ func asFloat64(
 	v interface{},
 ) (ret float64, e error) {
 	switch v.(type) {
-	case float64:
-		ret = float64(v.(float64))
 	case float32:
 		ret = float64(v.(float32))
-	case int64:
-		ret = float64(v.(int64))
-	case int32:
-		ret = float64(v.(int32))
-	case int16:
-		ret = float64(v.(int16))
-	case int8:
-		ret = float64(v.(int8))
+	case float64:
+		ret = float64(v.(float64))
 	case int:
 		ret = float64(v.(int))
-	case uint64:
-		ret = float64(v.(uint64))
-	case uint32:
-		ret = float64(v.(uint32))
-	case uint16:
-		ret = float64(v.(uint16))
-	case uint8:
-		ret = float64(v.(uint8))
+	case int16:
+		ret = float64(v.(int16))
+	case int32:
+		ret = float64(v.(int32))
+	case int64:
+		ret = float64(v.(int64))
 	case uint:
 		ret = float64(v.(uint))
+	case uint16:
+		ret = float64(v.(uint16))
+	case uint32:
+		ret = float64(v.(uint32))
+	case uint64:
+		ret = float64(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a float64", keys)
 	}
@@ -455,30 +545,26 @@ func asInt(
 	v interface{},
 ) (ret int, e error) {
 	switch v.(type) {
-	case float64:
-		ret = int(v.(float64))
 	case float32:
 		ret = int(v.(float32))
-	case int64:
-		ret = int(v.(int64))
-	case int32:
-		ret = int(v.(int32))
-	case int16:
-		ret = int(v.(int16))
-	case int8:
-		ret = int(v.(int8))
+	case float64:
+		ret = int(v.(float64))
 	case int:
 		ret = int(v.(int))
-	case uint64:
-		ret = int(v.(uint64))
-	case uint32:
-		ret = int(v.(uint32))
-	case uint16:
-		ret = int(v.(uint16))
-	case uint8:
-		ret = int(v.(uint8))
+	case int16:
+		ret = int(v.(int16))
+	case int32:
+		ret = int(v.(int32))
+	case int64:
+		ret = int(v.(int64))
 	case uint:
 		ret = int(v.(uint))
+	case uint16:
+		ret = int(v.(uint16))
+	case uint32:
+		ret = int(v.(uint32))
+	case uint64:
+		ret = int(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a int", keys)
 	}
@@ -589,30 +675,26 @@ func asInt16(
 	v interface{},
 ) (ret int16, e error) {
 	switch v.(type) {
-	case float64:
-		ret = int16(v.(float64))
 	case float32:
 		ret = int16(v.(float32))
-	case int64:
-		ret = int16(v.(int64))
-	case int32:
-		ret = int16(v.(int32))
-	case int16:
-		ret = int16(v.(int16))
-	case int8:
-		ret = int16(v.(int8))
+	case float64:
+		ret = int16(v.(float64))
 	case int:
 		ret = int16(v.(int))
-	case uint64:
-		ret = int16(v.(uint64))
-	case uint32:
-		ret = int16(v.(uint32))
-	case uint16:
-		ret = int16(v.(uint16))
-	case uint8:
-		ret = int16(v.(uint8))
+	case int16:
+		ret = int16(v.(int16))
+	case int32:
+		ret = int16(v.(int32))
+	case int64:
+		ret = int16(v.(int64))
 	case uint:
 		ret = int16(v.(uint))
+	case uint16:
+		ret = int16(v.(uint16))
+	case uint32:
+		ret = int16(v.(uint32))
+	case uint64:
+		ret = int16(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a int16", keys)
 	}
@@ -723,30 +805,26 @@ func asInt32(
 	v interface{},
 ) (ret int32, e error) {
 	switch v.(type) {
-	case float64:
-		ret = int32(v.(float64))
 	case float32:
 		ret = int32(v.(float32))
-	case int64:
-		ret = int32(v.(int64))
-	case int32:
-		ret = int32(v.(int32))
-	case int16:
-		ret = int32(v.(int16))
-	case int8:
-		ret = int32(v.(int8))
+	case float64:
+		ret = int32(v.(float64))
 	case int:
 		ret = int32(v.(int))
-	case uint64:
-		ret = int32(v.(uint64))
-	case uint32:
-		ret = int32(v.(uint32))
-	case uint16:
-		ret = int32(v.(uint16))
-	case uint8:
-		ret = int32(v.(uint8))
+	case int16:
+		ret = int32(v.(int16))
+	case int32:
+		ret = int32(v.(int32))
+	case int64:
+		ret = int32(v.(int64))
 	case uint:
 		ret = int32(v.(uint))
+	case uint16:
+		ret = int32(v.(uint16))
+	case uint32:
+		ret = int32(v.(uint32))
+	case uint64:
+		ret = int32(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a int32", keys)
 	}
@@ -857,30 +935,26 @@ func asInt64(
 	v interface{},
 ) (ret int64, e error) {
 	switch v.(type) {
-	case float64:
-		ret = int64(v.(float64))
 	case float32:
 		ret = int64(v.(float32))
-	case int64:
-		ret = int64(v.(int64))
-	case int32:
-		ret = int64(v.(int32))
-	case int16:
-		ret = int64(v.(int16))
-	case int8:
-		ret = int64(v.(int8))
+	case float64:
+		ret = int64(v.(float64))
 	case int:
 		ret = int64(v.(int))
-	case uint64:
-		ret = int64(v.(uint64))
-	case uint32:
-		ret = int64(v.(uint32))
-	case uint16:
-		ret = int64(v.(uint16))
-	case uint8:
-		ret = int64(v.(uint8))
+	case int16:
+		ret = int64(v.(int16))
+	case int32:
+		ret = int64(v.(int32))
+	case int64:
+		ret = int64(v.(int64))
 	case uint:
 		ret = int64(v.(uint))
+	case uint16:
+		ret = int64(v.(uint16))
+	case uint32:
+		ret = int64(v.(uint32))
+	case uint64:
+		ret = int64(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a int64", keys)
 	}
@@ -1103,30 +1177,26 @@ func asUint(
 	v interface{},
 ) (ret uint, e error) {
 	switch v.(type) {
-	case float64:
-		ret = uint(v.(float64))
 	case float32:
 		ret = uint(v.(float32))
-	case int64:
-		ret = uint(v.(int64))
-	case int32:
-		ret = uint(v.(int32))
-	case int16:
-		ret = uint(v.(int16))
-	case int8:
-		ret = uint(v.(int8))
+	case float64:
+		ret = uint(v.(float64))
 	case int:
 		ret = uint(v.(int))
-	case uint64:
-		ret = uint(v.(uint64))
-	case uint32:
-		ret = uint(v.(uint32))
-	case uint16:
-		ret = uint(v.(uint16))
-	case uint8:
-		ret = uint(v.(uint8))
+	case int16:
+		ret = uint(v.(int16))
+	case int32:
+		ret = uint(v.(int32))
+	case int64:
+		ret = uint(v.(int64))
 	case uint:
 		ret = uint(v.(uint))
+	case uint16:
+		ret = uint(v.(uint16))
+	case uint32:
+		ret = uint(v.(uint32))
+	case uint64:
+		ret = uint(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a uint", keys)
 	}
@@ -1237,30 +1307,26 @@ func asUint16(
 	v interface{},
 ) (ret uint16, e error) {
 	switch v.(type) {
-	case float64:
-		ret = uint16(v.(float64))
 	case float32:
 		ret = uint16(v.(float32))
-	case int64:
-		ret = uint16(v.(int64))
-	case int32:
-		ret = uint16(v.(int32))
-	case int16:
-		ret = uint16(v.(int16))
-	case int8:
-		ret = uint16(v.(int8))
+	case float64:
+		ret = uint16(v.(float64))
 	case int:
 		ret = uint16(v.(int))
-	case uint64:
-		ret = uint16(v.(uint64))
-	case uint32:
-		ret = uint16(v.(uint32))
-	case uint16:
-		ret = uint16(v.(uint16))
-	case uint8:
-		ret = uint16(v.(uint8))
+	case int16:
+		ret = uint16(v.(int16))
+	case int32:
+		ret = uint16(v.(int32))
+	case int64:
+		ret = uint16(v.(int64))
 	case uint:
 		ret = uint16(v.(uint))
+	case uint16:
+		ret = uint16(v.(uint16))
+	case uint32:
+		ret = uint16(v.(uint32))
+	case uint64:
+		ret = uint16(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a uint16", keys)
 	}
@@ -1371,30 +1437,26 @@ func asUint32(
 	v interface{},
 ) (ret uint32, e error) {
 	switch v.(type) {
-	case float64:
-		ret = uint32(v.(float64))
 	case float32:
 		ret = uint32(v.(float32))
-	case int64:
-		ret = uint32(v.(int64))
-	case int32:
-		ret = uint32(v.(int32))
-	case int16:
-		ret = uint32(v.(int16))
-	case int8:
-		ret = uint32(v.(int8))
+	case float64:
+		ret = uint32(v.(float64))
 	case int:
 		ret = uint32(v.(int))
-	case uint64:
-		ret = uint32(v.(uint64))
-	case uint32:
-		ret = uint32(v.(uint32))
-	case uint16:
-		ret = uint32(v.(uint16))
-	case uint8:
-		ret = uint32(v.(uint8))
+	case int16:
+		ret = uint32(v.(int16))
+	case int32:
+		ret = uint32(v.(int32))
+	case int64:
+		ret = uint32(v.(int64))
 	case uint:
 		ret = uint32(v.(uint))
+	case uint16:
+		ret = uint32(v.(uint16))
+	case uint32:
+		ret = uint32(v.(uint32))
+	case uint64:
+		ret = uint32(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a uint32", keys)
 	}
@@ -1505,30 +1567,26 @@ func asUint64(
 	v interface{},
 ) (ret uint64, e error) {
 	switch v.(type) {
-	case float64:
-		ret = uint64(v.(float64))
 	case float32:
 		ret = uint64(v.(float32))
-	case int64:
-		ret = uint64(v.(int64))
-	case int32:
-		ret = uint64(v.(int32))
-	case int16:
-		ret = uint64(v.(int16))
-	case int8:
-		ret = uint64(v.(int8))
+	case float64:
+		ret = uint64(v.(float64))
 	case int:
 		ret = uint64(v.(int))
-	case uint64:
-		ret = uint64(v.(uint64))
-	case uint32:
-		ret = uint64(v.(uint32))
-	case uint16:
-		ret = uint64(v.(uint16))
-	case uint8:
-		ret = uint64(v.(uint8))
+	case int16:
+		ret = uint64(v.(int16))
+	case int32:
+		ret = uint64(v.(int32))
+	case int64:
+		ret = uint64(v.(int64))
 	case uint:
 		ret = uint64(v.(uint))
+	case uint16:
+		ret = uint64(v.(uint16))
+	case uint32:
+		ret = uint64(v.(uint32))
+	case uint64:
+		ret = uint64(v.(uint64))
 	default:
 		e = fmt.Errorf("Key %v is not a uint64", keys)
 	}
