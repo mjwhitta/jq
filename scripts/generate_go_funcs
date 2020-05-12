@@ -23,23 +23,96 @@ subinfo() { echo -e "${color:+\e[36m}[=] $*\e[0m"; }
 warn() { echo -e "${color:+\e[33m}[-] $*\e[0m"; }
 ### Helpers end
 
-generate_funcs() {
-    local type="$1"
-    local rtype="${type:-interface{\}}"
+generate_keys_func() {
+    local datatype="$1" && shift
+    local family="$1" && shift
 
-    case "$type" in
+    cat <<EOF
+func mustGet${family}${datatype}Keys(
+    val interface{},
+) (ret []string) {
+EOF
+
+    case "$datatype" in
+        "Map")
+            cat <<EOF
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+            return ret[i] < ret[j]
+        }
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+EOF
+            ;;
+    esac
+
+    cat <<EOF
+	switch val.(type) {
+EOF
+
+    case "$datatype" in
+        "Array")
+            for thetype in "$@"; do
+                cat <<EOF
+	case []$thetype:
+		for i := 0; i < len(val.([]$thetype)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+EOF
+            done; unset thetype
+            ;;
+        "Map")
+            for thetype in "$@"; do
+                cat <<EOF
+	case map[string]$thetype:
+		for k := range val.(map[string]$thetype) {
+			ret = append(ret, k)
+		}
+EOF
+            done; unset thetype
+            ;;
+    esac
+
+    cat <<EOF
+    }
+
+EOF
+
+    case "$datatype" in
+        "Map")
+            cat <<EOF
+    if !sort.SliceIsSorted(ret, less) {
+        sort.SliceStable(ret, less)
+    }
+EOF
+            ;;
+    esac
+
+    cat <<EOF
+	return
+}
+
+EOF
+}
+
+generate_type_funcs() {
+    local thetype="$1"
+    local rtype="${thetype:-interface{\}}"
+
+    case "$thetype" in
         "") ;;
         "bool")
             cat <<EOF
-func as${type^}(
+func as${thetype^}(
     keys []interface{},
     v interface{},
-) (ret $type, e error) {
+) (ret $thetype, e error) {
     switch v.(type) {
-    case $type:
-        ret = v.($type)
+    case $thetype:
+        ret = v.($thetype)
     default:
-        e = fmt.Errorf("Key %v is not a $type", keys)
+        e = fmt.Errorf("Key %v is not a $thetype", keys)
     }
     return
 }
@@ -48,27 +121,27 @@ EOF
             ;;
         "float"*|"int"*|"uint"*)
             cat <<EOF
-func as${type^}(
+func as${thetype^}(
     keys []interface{},
     v interface{},
-) (ret $type, e error) {
+) (ret $thetype, e error) {
     switch v.(type) {
 EOF
 
     for realtype in \
         float32 float64 \
-        int int16 int32 int64 \
-        uint uint16 uint32 uint64
+        int int8 int16 int32 int64 \
+        uint uint8 uint16 uint32 uint64
     do
         cat <<EOF
     case $realtype:
-        ret = $type(v.($realtype))
+        ret = $thetype(v.($realtype))
 EOF
     done; unset maptype
 
     cat <<EOF
     default:
-        e = fmt.Errorf("Key %v is not a $type", keys)
+        e = fmt.Errorf("Key %v is not a $thetype", keys)
     }
     return
 }
@@ -77,15 +150,15 @@ EOF
             ;;
         "string")
             cat <<EOF
-func as${type^}(
+func as${thetype^}(
     keys []interface{},
     v interface{},
-) (ret $type, e error) {
+) (ret $thetype, e error) {
     switch v.(type) {
-    case $type:
-        ret = v.($type)
+    case $thetype:
+        ret = v.($thetype)
     default:
-        e = fmt.Errorf("Key %v is not a $type", keys)
+        e = fmt.Errorf("Key %v is not a $thetype", keys)
     }
     return
 }
@@ -94,7 +167,7 @@ EOF
             ;;
     esac
 
-    case "$type" in
+    case "$thetype" in
         "")
             cat <<EOF
 // Get will return the value for the specified key(s) as a $rtype.
@@ -139,9 +212,9 @@ EOF
     for arrtype in \
         bool \
         float32 float64 \
-        int int16 int32 int64 \
+        int int8 int16 int32 int64 \
         string \
-        uint uint16 uint32 uint64
+        uint uint8 uint16 uint32 uint64
     do
         cat <<EOF
     case []$arrtype:
@@ -180,9 +253,9 @@ EOF
     for maptype in \
         bool \
         float32 float64 \
-        int int16 int32 int64 \
+        int int8 int16 int32 int64 \
         string \
-        uint uint16 uint32 uint64
+        uint uint8 uint16 uint32 uint64
     do
         cat <<EOF
     case map[string]$maptype:
@@ -206,32 +279,32 @@ EOF
             ;;
         "bool"|"float"*|"int"*|"uint"*|"string")
             cat <<EOF
-// Get${type^} will return the value for the specified key(s) as a
+// Get${thetype^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) Get${type^}(keys ...interface{}) (ret $rtype) {
-    ret, _ = j.MustGet${type^}(keys...)
+func (j *JSON) Get${thetype^}(keys ...interface{}) (ret $rtype) {
+    ret, _ = j.MustGet${thetype^}(keys...)
     return
 }
 
-// Get${type^}Array will return an array for the specified key(s) as a
+// Get${thetype^}Array will return an array for the specified key(s) as a
 // []$rtype.
-func (j *JSON) Get${type^}Array(keys ...interface{}) (ret []$rtype) {
-    ret, _ = j.MustGet${type^}Array(keys...)
+func (j *JSON) Get${thetype^}Array(keys ...interface{}) (ret []$rtype) {
+    ret, _ = j.MustGet${thetype^}Array(keys...)
     return
 }
 
-// Get${type^}Map will return a map for the specified key(s) as a
+// Get${thetype^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) Get${type^}Map(
+func (j *JSON) Get${thetype^}Map(
     keys ...interface{},
 ) (ret map[string]$rtype) {
-    ret, _ = j.MustGet${type^}Map(keys...)
+    ret, _ = j.MustGet${thetype^}Map(keys...)
     return
 }
 
-// MustGet${type^} will return the value for the specified key(s) as a
+// MustGet${thetype^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) MustGet${type^}(
+func (j *JSON) MustGet${thetype^}(
     keys ...interface{},
 ) (ret $rtype, e error) {
     var val interface{}
@@ -240,13 +313,13 @@ func (j *JSON) MustGet${type^}(
         return
     }
 
-    ret, e = as${type^}(keys, val)
+    ret, e = as${thetype^}(keys, val)
     return
 }
 
-// MustGet${type^}Array will return an array for the specified key(s)
+// MustGet${thetype^}Array will return an array for the specified key(s)
 // as a []$rtype.
-func (j *JSON) MustGet${type^}Array(
+func (j *JSON) MustGet${thetype^}Array(
     keys ...interface{},
 ) (ret []$rtype, e error) {
     var tmp $rtype
@@ -267,7 +340,7 @@ func (j *JSON) MustGet${type^}Array(
     }
 
     for _, v := range val.([]interface{}) {
-        if tmp, e = as${type^}(keys, v); e != nil {
+        if tmp, e = as${thetype^}(keys, v); e != nil {
             ret = []$rtype{}
             return
         }
@@ -277,9 +350,9 @@ func (j *JSON) MustGet${type^}Array(
     return
 }
 
-// MustGet${type^}Map will return a map for the specified key(s) as a
+// MustGet${thetype^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) MustGet${type^}Map(
+func (j *JSON) MustGet${thetype^}Map(
     keys ...interface{},
 ) (ret map[string]$rtype, e error) {
     var val interface{}
@@ -296,7 +369,7 @@ func (j *JSON) MustGet${type^}Map(
     }
 
     for k, v := range val.(map[string]interface{}) {
-        if ret[k], e = as${type^}(keys, v); e != nil {
+        if ret[k], e = as${thetype^}(keys, v); e != nil {
             ret = map[string]$rtype{}
             return
         }
@@ -366,12 +439,22 @@ $(
         "" \
         bool \
         float32 float64 \
-        int int16 int32 int64 \
+        int int8 int16 int32 int64 \
         string \
-        uint uint16 uint32 uint64
+        uint uint8 uint16 uint32 uint64
     do
-        generate_funcs $thetype
+        generate_type_funcs $thetype
     done; unset thetype
+
+    for datatype in Array Map; do
+        generate_keys_func "$datatype" "" bool string interface{}
+        generate_keys_func "$datatype" "Float" float32 float64
+        generate_keys_func "$datatype" "Int" int int8 int16 int32 \
+            int64
+        generate_keys_func "$datatype" "String" string
+        generate_keys_func "$datatype" "Uint" uint uint8 uint16 \
+            uint32 uint64
+    done; unset datatype
 )
 
 // MustGetKeys will return a list of valid keys if the specified key
@@ -379,9 +462,6 @@ $(
 func (j *JSON) MustGetKeys(
 	keys ...interface{},
 ) (ret []string, e error) {
-	var less = func(i, j int) bool {
-		return (strings.ToLower(ret[i]) < strings.ToLower(ret[j]))
-	}
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
@@ -389,42 +469,24 @@ func (j *JSON) MustGetKeys(
 	}
 
 	switch val.(type) {
-$(
-    for thetype in \
-        bool \
-        float32 float64 \
-        int int16 int32 int64 \
-        string \
-        uint uint16 uint32 uint64
-    do
-        cat <<EOC
-	case []$thetype:
-		for i := 0; i < len(val.([]$thetype)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]$thetype:
-		for k := range val.(map[string]$thetype) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-EOC
-    done; unset thetype
-)
-	case []interface{}:
-		for i := 0; i < len(val.([]interface{})); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]interface{}:
-		for k := range val.(map[string]interface{}) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
+	case []bool, []string, []interface{}:
+        ret = mustGetArrayKeys(val)
+    case []float32, []float64:
+        ret = mustGetFloatArrayKeys(val)
+	case []int, []int8, []int16, []int32, []int64:
+        ret = mustGetIntArrayKeys(val)
+	case []uint, []uint8, []uint16, []uint32, []uint64:
+        ret = mustGetUintArrayKeys(val)
+	case map[string]bool, map[string]string, map[string]interface{}:
+        ret = mustGetMapKeys(val)
+    case map[string]float32, map[string]float64:
+        ret = mustGetFloatMapKeys(val)
+	case map[string]int, map[string]int8, map[string]int16,
+		map[string]int32, map[string]int64:
+        ret = mustGetIntMapKeys(val)
+	case map[string]uint, map[string]uint8, map[string]uint16,
+		map[string]uint32, map[string]uint64:
+        ret = mustGetUintMapKeys(val)
 	default:
 		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
 	}
@@ -436,7 +498,7 @@ EOC
 func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 	var e error
 	var parentArr []interface{}
-	var parentMap = map[string]interface{}{}
+	var parentMap map[string]interface{}
 	var tryInt int
 	var tryString string
 
@@ -446,9 +508,9 @@ $(
     for maptype in \
         bool \
         float32 float64 \
-        int int16 int32 int64 \
+        int int8 int16 int32 int64 \
         string \
-        uint uint16 uint32 uint64
+        uint uint8 uint16 uint32 uint64
     do
         cat <<EOC
 		case map[string]$maptype:

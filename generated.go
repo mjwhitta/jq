@@ -61,6 +61,10 @@ func (j *JSON) MustGetArray(
 		for _, v := range val.([]int) {
 			ret = append(ret, v)
 		}
+	case []int8:
+		for _, v := range val.([]int8) {
+			ret = append(ret, v)
+		}
 	case []int16:
 		for _, v := range val.([]int16) {
 			ret = append(ret, v)
@@ -79,6 +83,10 @@ func (j *JSON) MustGetArray(
 		}
 	case []uint:
 		for _, v := range val.([]uint) {
+			ret = append(ret, v)
+		}
+	case []uint8:
+		for _, v := range val.([]uint8) {
 			ret = append(ret, v)
 		}
 	case []uint16:
@@ -132,6 +140,10 @@ func (j *JSON) MustGetMap(
 		for k, v := range val.(map[string]int) {
 			ret[k] = v
 		}
+	case map[string]int8:
+		for k, v := range val.(map[string]int8) {
+			ret[k] = v
+		}
 	case map[string]int16:
 		for k, v := range val.(map[string]int16) {
 			ret[k] = v
@@ -150,6 +162,10 @@ func (j *JSON) MustGetMap(
 		}
 	case map[string]uint:
 		for k, v := range val.(map[string]uint) {
+			ret[k] = v
+		}
+	case map[string]uint8:
+		for k, v := range val.(map[string]uint8) {
 			ret[k] = v
 		}
 	case map[string]uint16:
@@ -296,6 +312,8 @@ func asFloat32(
 		ret = float32(v.(float64))
 	case int:
 		ret = float32(v.(int))
+	case int8:
+		ret = float32(v.(int8))
 	case int16:
 		ret = float32(v.(int16))
 	case int32:
@@ -304,6 +322,8 @@ func asFloat32(
 		ret = float32(v.(int64))
 	case uint:
 		ret = float32(v.(uint))
+	case uint8:
+		ret = float32(v.(uint8))
 	case uint16:
 		ret = float32(v.(uint16))
 	case uint32:
@@ -426,6 +446,8 @@ func asFloat64(
 		ret = float64(v.(float64))
 	case int:
 		ret = float64(v.(int))
+	case int8:
+		ret = float64(v.(int8))
 	case int16:
 		ret = float64(v.(int16))
 	case int32:
@@ -434,6 +456,8 @@ func asFloat64(
 		ret = float64(v.(int64))
 	case uint:
 		ret = float64(v.(uint))
+	case uint8:
+		ret = float64(v.(uint8))
 	case uint16:
 		ret = float64(v.(uint16))
 	case uint32:
@@ -556,6 +580,8 @@ func asInt(
 		ret = int(v.(float64))
 	case int:
 		ret = int(v.(int))
+	case int8:
+		ret = int(v.(int8))
 	case int16:
 		ret = int(v.(int16))
 	case int32:
@@ -564,6 +590,8 @@ func asInt(
 		ret = int(v.(int64))
 	case uint:
 		ret = int(v.(uint))
+	case uint8:
+		ret = int(v.(uint8))
 	case uint16:
 		ret = int(v.(uint16))
 	case uint32:
@@ -675,6 +703,140 @@ func (j *JSON) MustGetIntMap(
 	return
 }
 
+func asInt8(
+	keys []interface{},
+	v interface{},
+) (ret int8, e error) {
+	switch v.(type) {
+	case float32:
+		ret = int8(v.(float32))
+	case float64:
+		ret = int8(v.(float64))
+	case int:
+		ret = int8(v.(int))
+	case int8:
+		ret = int8(v.(int8))
+	case int16:
+		ret = int8(v.(int16))
+	case int32:
+		ret = int8(v.(int32))
+	case int64:
+		ret = int8(v.(int64))
+	case uint:
+		ret = int8(v.(uint))
+	case uint8:
+		ret = int8(v.(uint8))
+	case uint16:
+		ret = int8(v.(uint16))
+	case uint32:
+		ret = int8(v.(uint32))
+	case uint64:
+		ret = int8(v.(uint64))
+	default:
+		e = fmt.Errorf("Key %v is not a int8", keys)
+	}
+	return
+}
+
+// GetInt8 will return the value for the specified key(s) as a
+// int8.
+func (j *JSON) GetInt8(keys ...interface{}) (ret int8) {
+	ret, _ = j.MustGetInt8(keys...)
+	return
+}
+
+// GetInt8Array will return an array for the specified key(s) as a
+// []int8.
+func (j *JSON) GetInt8Array(keys ...interface{}) (ret []int8) {
+	ret, _ = j.MustGetInt8Array(keys...)
+	return
+}
+
+// GetInt8Map will return a map for the specified key(s) as a
+// map[string]int8.
+func (j *JSON) GetInt8Map(
+	keys ...interface{},
+) (ret map[string]int8) {
+	ret, _ = j.MustGetInt8Map(keys...)
+	return
+}
+
+// MustGetInt8 will return the value for the specified key(s) as a
+// int8.
+func (j *JSON) MustGetInt8(
+	keys ...interface{},
+) (ret int8, e error) {
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	ret, e = asInt8(keys, val)
+	return
+}
+
+// MustGetInt8Array will return an array for the specified key(s)
+// as a []int8.
+func (j *JSON) MustGetInt8Array(
+	keys ...interface{},
+) (ret []int8, e error) {
+	var tmp int8
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	if _, ok := val.([]int8); ok {
+		ret = val.([]int8)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []int8", keys)
+		return
+	}
+
+	for _, v := range val.([]interface{}) {
+		if tmp, e = asInt8(keys, v); e != nil {
+			ret = []int8{}
+			return
+		}
+		ret = append(ret, tmp)
+	}
+
+	return
+}
+
+// MustGetInt8Map will return a map for the specified key(s) as a
+// map[string]int8.
+func (j *JSON) MustGetInt8Map(
+	keys ...interface{},
+) (ret map[string]int8, e error) {
+	var val interface{}
+
+	ret = map[string]int8{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	if _, ok := val.(map[string]int8); ok {
+		ret = val.(map[string]int8)
+		return
+	}
+
+	for k, v := range val.(map[string]interface{}) {
+		if ret[k], e = asInt8(keys, v); e != nil {
+			ret = map[string]int8{}
+			return
+		}
+	}
+
+	return
+}
+
 func asInt16(
 	keys []interface{},
 	v interface{},
@@ -686,6 +848,8 @@ func asInt16(
 		ret = int16(v.(float64))
 	case int:
 		ret = int16(v.(int))
+	case int8:
+		ret = int16(v.(int8))
 	case int16:
 		ret = int16(v.(int16))
 	case int32:
@@ -694,6 +858,8 @@ func asInt16(
 		ret = int16(v.(int64))
 	case uint:
 		ret = int16(v.(uint))
+	case uint8:
+		ret = int16(v.(uint8))
 	case uint16:
 		ret = int16(v.(uint16))
 	case uint32:
@@ -816,6 +982,8 @@ func asInt32(
 		ret = int32(v.(float64))
 	case int:
 		ret = int32(v.(int))
+	case int8:
+		ret = int32(v.(int8))
 	case int16:
 		ret = int32(v.(int16))
 	case int32:
@@ -824,6 +992,8 @@ func asInt32(
 		ret = int32(v.(int64))
 	case uint:
 		ret = int32(v.(uint))
+	case uint8:
+		ret = int32(v.(uint8))
 	case uint16:
 		ret = int32(v.(uint16))
 	case uint32:
@@ -946,6 +1116,8 @@ func asInt64(
 		ret = int64(v.(float64))
 	case int:
 		ret = int64(v.(int))
+	case int8:
+		ret = int64(v.(int8))
 	case int16:
 		ret = int64(v.(int16))
 	case int32:
@@ -954,6 +1126,8 @@ func asInt64(
 		ret = int64(v.(int64))
 	case uint:
 		ret = int64(v.(uint))
+	case uint8:
+		ret = int64(v.(uint8))
 	case uint16:
 		ret = int64(v.(uint16))
 	case uint32:
@@ -1188,6 +1362,8 @@ func asUint(
 		ret = uint(v.(float64))
 	case int:
 		ret = uint(v.(int))
+	case int8:
+		ret = uint(v.(int8))
 	case int16:
 		ret = uint(v.(int16))
 	case int32:
@@ -1196,6 +1372,8 @@ func asUint(
 		ret = uint(v.(int64))
 	case uint:
 		ret = uint(v.(uint))
+	case uint8:
+		ret = uint(v.(uint8))
 	case uint16:
 		ret = uint(v.(uint16))
 	case uint32:
@@ -1307,6 +1485,140 @@ func (j *JSON) MustGetUintMap(
 	return
 }
 
+func asUint8(
+	keys []interface{},
+	v interface{},
+) (ret uint8, e error) {
+	switch v.(type) {
+	case float32:
+		ret = uint8(v.(float32))
+	case float64:
+		ret = uint8(v.(float64))
+	case int:
+		ret = uint8(v.(int))
+	case int8:
+		ret = uint8(v.(int8))
+	case int16:
+		ret = uint8(v.(int16))
+	case int32:
+		ret = uint8(v.(int32))
+	case int64:
+		ret = uint8(v.(int64))
+	case uint:
+		ret = uint8(v.(uint))
+	case uint8:
+		ret = uint8(v.(uint8))
+	case uint16:
+		ret = uint8(v.(uint16))
+	case uint32:
+		ret = uint8(v.(uint32))
+	case uint64:
+		ret = uint8(v.(uint64))
+	default:
+		e = fmt.Errorf("Key %v is not a uint8", keys)
+	}
+	return
+}
+
+// GetUint8 will return the value for the specified key(s) as a
+// uint8.
+func (j *JSON) GetUint8(keys ...interface{}) (ret uint8) {
+	ret, _ = j.MustGetUint8(keys...)
+	return
+}
+
+// GetUint8Array will return an array for the specified key(s) as a
+// []uint8.
+func (j *JSON) GetUint8Array(keys ...interface{}) (ret []uint8) {
+	ret, _ = j.MustGetUint8Array(keys...)
+	return
+}
+
+// GetUint8Map will return a map for the specified key(s) as a
+// map[string]uint8.
+func (j *JSON) GetUint8Map(
+	keys ...interface{},
+) (ret map[string]uint8) {
+	ret, _ = j.MustGetUint8Map(keys...)
+	return
+}
+
+// MustGetUint8 will return the value for the specified key(s) as a
+// uint8.
+func (j *JSON) MustGetUint8(
+	keys ...interface{},
+) (ret uint8, e error) {
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	ret, e = asUint8(keys, val)
+	return
+}
+
+// MustGetUint8Array will return an array for the specified key(s)
+// as a []uint8.
+func (j *JSON) MustGetUint8Array(
+	keys ...interface{},
+) (ret []uint8, e error) {
+	var tmp uint8
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	if _, ok := val.([]uint8); ok {
+		ret = val.([]uint8)
+		return
+	}
+
+	if _, ok := val.([]interface{}); !ok {
+		e = fmt.Errorf("Key %v is not a []uint8", keys)
+		return
+	}
+
+	for _, v := range val.([]interface{}) {
+		if tmp, e = asUint8(keys, v); e != nil {
+			ret = []uint8{}
+			return
+		}
+		ret = append(ret, tmp)
+	}
+
+	return
+}
+
+// MustGetUint8Map will return a map for the specified key(s) as a
+// map[string]uint8.
+func (j *JSON) MustGetUint8Map(
+	keys ...interface{},
+) (ret map[string]uint8, e error) {
+	var val interface{}
+
+	ret = map[string]uint8{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	if _, ok := val.(map[string]uint8); ok {
+		ret = val.(map[string]uint8)
+		return
+	}
+
+	for k, v := range val.(map[string]interface{}) {
+		if ret[k], e = asUint8(keys, v); e != nil {
+			ret = map[string]uint8{}
+			return
+		}
+	}
+
+	return
+}
+
 func asUint16(
 	keys []interface{},
 	v interface{},
@@ -1318,6 +1630,8 @@ func asUint16(
 		ret = uint16(v.(float64))
 	case int:
 		ret = uint16(v.(int))
+	case int8:
+		ret = uint16(v.(int8))
 	case int16:
 		ret = uint16(v.(int16))
 	case int32:
@@ -1326,6 +1640,8 @@ func asUint16(
 		ret = uint16(v.(int64))
 	case uint:
 		ret = uint16(v.(uint))
+	case uint8:
+		ret = uint16(v.(uint8))
 	case uint16:
 		ret = uint16(v.(uint16))
 	case uint32:
@@ -1448,6 +1764,8 @@ func asUint32(
 		ret = uint32(v.(float64))
 	case int:
 		ret = uint32(v.(int))
+	case int8:
+		ret = uint32(v.(int8))
 	case int16:
 		ret = uint32(v.(int16))
 	case int32:
@@ -1456,6 +1774,8 @@ func asUint32(
 		ret = uint32(v.(int64))
 	case uint:
 		ret = uint32(v.(uint))
+	case uint8:
+		ret = uint32(v.(uint8))
 	case uint16:
 		ret = uint32(v.(uint16))
 	case uint32:
@@ -1578,6 +1898,8 @@ func asUint64(
 		ret = uint64(v.(float64))
 	case int:
 		ret = uint64(v.(int))
+	case int8:
+		ret = uint64(v.(int8))
 	case int16:
 		ret = uint64(v.(int16))
 	case int32:
@@ -1586,6 +1908,8 @@ func asUint64(
 		ret = uint64(v.(int64))
 	case uint:
 		ret = uint64(v.(uint))
+	case uint8:
+		ret = uint64(v.(uint8))
 	case uint16:
 		ret = uint64(v.(uint16))
 	case uint32:
@@ -1697,14 +2021,279 @@ func (j *JSON) MustGetUint64Map(
 	return
 }
 
+func mustGetArrayKeys(
+	val interface{},
+) (ret []string) {
+	switch val.(type) {
+	case []bool:
+		for i := 0; i < len(val.([]bool)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []string:
+		for i := 0; i < len(val.([]string)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []interface{}:
+		for i := 0; i < len(val.([]interface{})); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetFloatArrayKeys(
+	val interface{},
+) (ret []string) {
+	switch val.(type) {
+	case []float32:
+		for i := 0; i < len(val.([]float32)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []float64:
+		for i := 0; i < len(val.([]float64)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetIntArrayKeys(
+	val interface{},
+) (ret []string) {
+	switch val.(type) {
+	case []int:
+		for i := 0; i < len(val.([]int)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []int8:
+		for i := 0; i < len(val.([]int8)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []int16:
+		for i := 0; i < len(val.([]int16)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []int32:
+		for i := 0; i < len(val.([]int32)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []int64:
+		for i := 0; i < len(val.([]int64)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetStringArrayKeys(
+	val interface{},
+) (ret []string) {
+	switch val.(type) {
+	case []string:
+		for i := 0; i < len(val.([]string)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetUintArrayKeys(
+	val interface{},
+) (ret []string) {
+	switch val.(type) {
+	case []uint:
+		for i := 0; i < len(val.([]uint)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []uint8:
+		for i := 0; i < len(val.([]uint8)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []uint16:
+		for i := 0; i < len(val.([]uint16)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []uint32:
+		for i := 0; i < len(val.([]uint32)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	case []uint64:
+		for i := 0; i < len(val.([]uint64)); i++ {
+			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetMapKeys(
+	val interface{},
+) (ret []string) {
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+			return ret[i] < ret[j]
+		}
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+	switch val.(type) {
+	case map[string]bool:
+		for k := range val.(map[string]bool) {
+			ret = append(ret, k)
+		}
+	case map[string]string:
+		for k := range val.(map[string]string) {
+			ret = append(ret, k)
+		}
+	case map[string]interface{}:
+		for k := range val.(map[string]interface{}) {
+			ret = append(ret, k)
+		}
+	}
+
+	if !sort.SliceIsSorted(ret, less) {
+		sort.SliceStable(ret, less)
+	}
+	return
+}
+
+func mustGetFloatMapKeys(
+	val interface{},
+) (ret []string) {
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+			return ret[i] < ret[j]
+		}
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+	switch val.(type) {
+	case map[string]float32:
+		for k := range val.(map[string]float32) {
+			ret = append(ret, k)
+		}
+	case map[string]float64:
+		for k := range val.(map[string]float64) {
+			ret = append(ret, k)
+		}
+	}
+
+	if !sort.SliceIsSorted(ret, less) {
+		sort.SliceStable(ret, less)
+	}
+	return
+}
+
+func mustGetIntMapKeys(
+	val interface{},
+) (ret []string) {
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+			return ret[i] < ret[j]
+		}
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+	switch val.(type) {
+	case map[string]int:
+		for k := range val.(map[string]int) {
+			ret = append(ret, k)
+		}
+	case map[string]int8:
+		for k := range val.(map[string]int8) {
+			ret = append(ret, k)
+		}
+	case map[string]int16:
+		for k := range val.(map[string]int16) {
+			ret = append(ret, k)
+		}
+	case map[string]int32:
+		for k := range val.(map[string]int32) {
+			ret = append(ret, k)
+		}
+	case map[string]int64:
+		for k := range val.(map[string]int64) {
+			ret = append(ret, k)
+		}
+	}
+
+	if !sort.SliceIsSorted(ret, less) {
+		sort.SliceStable(ret, less)
+	}
+	return
+}
+
+func mustGetStringMapKeys(
+	val interface{},
+) (ret []string) {
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+			return ret[i] < ret[j]
+		}
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+	switch val.(type) {
+	case map[string]string:
+		for k := range val.(map[string]string) {
+			ret = append(ret, k)
+		}
+	}
+
+	if !sort.SliceIsSorted(ret, less) {
+		sort.SliceStable(ret, less)
+	}
+	return
+}
+
+func mustGetUintMapKeys(
+	val interface{},
+) (ret []string) {
+	var less = func(i, j int) bool {
+		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+			return ret[i] < ret[j]
+		}
+
+		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
+	}
+	switch val.(type) {
+	case map[string]uint:
+		for k := range val.(map[string]uint) {
+			ret = append(ret, k)
+		}
+	case map[string]uint8:
+		for k := range val.(map[string]uint8) {
+			ret = append(ret, k)
+		}
+	case map[string]uint16:
+		for k := range val.(map[string]uint16) {
+			ret = append(ret, k)
+		}
+	case map[string]uint32:
+		for k := range val.(map[string]uint32) {
+			ret = append(ret, k)
+		}
+	case map[string]uint64:
+		for k := range val.(map[string]uint64) {
+			ret = append(ret, k)
+		}
+	}
+
+	if !sort.SliceIsSorted(ret, less) {
+		sort.SliceStable(ret, less)
+	}
+	return
+}
+
 // MustGetKeys will return a list of valid keys if the specified key
 // returns an array or map.
 func (j *JSON) MustGetKeys(
 	keys ...interface{},
 ) (ret []string, e error) {
-	var less = func(i, j int) bool {
-		return (strings.ToLower(ret[i]) < strings.ToLower(ret[j]))
-	}
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
@@ -1712,162 +2301,24 @@ func (j *JSON) MustGetKeys(
 	}
 
 	switch val.(type) {
-	case []bool:
-		for i := 0; i < len(val.([]bool)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]bool:
-		for k := range val.(map[string]bool) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []float32:
-		for i := 0; i < len(val.([]float32)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]float32:
-		for k := range val.(map[string]float32) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []float64:
-		for i := 0; i < len(val.([]float64)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]float64:
-		for k := range val.(map[string]float64) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []int:
-		for i := 0; i < len(val.([]int)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]int:
-		for k := range val.(map[string]int) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []int16:
-		for i := 0; i < len(val.([]int16)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]int16:
-		for k := range val.(map[string]int16) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []int32:
-		for i := 0; i < len(val.([]int32)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]int32:
-		for k := range val.(map[string]int32) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []int64:
-		for i := 0; i < len(val.([]int64)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]int64:
-		for k := range val.(map[string]int64) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []string:
-		for i := 0; i < len(val.([]string)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]string:
-		for k := range val.(map[string]string) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []uint:
-		for i := 0; i < len(val.([]uint)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]uint:
-		for k := range val.(map[string]uint) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []uint16:
-		for i := 0; i < len(val.([]uint16)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]uint16:
-		for k := range val.(map[string]uint16) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []uint32:
-		for i := 0; i < len(val.([]uint32)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]uint32:
-		for k := range val.(map[string]uint32) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []uint64:
-		for i := 0; i < len(val.([]uint64)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]uint64:
-		for k := range val.(map[string]uint64) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
-	case []interface{}:
-		for i := 0; i < len(val.([]interface{})); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	case map[string]interface{}:
-		for k := range val.(map[string]interface{}) {
-			ret = append(ret, k)
-		}
-
-		if !sort.SliceIsSorted(ret, less) {
-			sort.SliceStable(ret, less)
-		}
+	case []bool, []string, []interface{}:
+		ret = mustGetArrayKeys(val)
+	case []float32, []float64:
+		ret = mustGetFloatArrayKeys(val)
+	case []int, []int8, []int16, []int32, []int64:
+		ret = mustGetIntArrayKeys(val)
+	case []uint, []uint8, []uint16, []uint32, []uint64:
+		ret = mustGetUintArrayKeys(val)
+	case map[string]bool, map[string]string, map[string]interface{}:
+		ret = mustGetMapKeys(val)
+	case map[string]float32, map[string]float64:
+		ret = mustGetFloatMapKeys(val)
+	case map[string]int, map[string]int8, map[string]int16,
+		map[string]int32, map[string]int64:
+		ret = mustGetIntMapKeys(val)
+	case map[string]uint, map[string]uint8, map[string]uint16,
+		map[string]uint32, map[string]uint64:
+		ret = mustGetUintMapKeys(val)
 	default:
 		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
 	}
@@ -1879,7 +2330,7 @@ func (j *JSON) MustGetKeys(
 func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 	var e error
 	var parentArr []interface{}
-	var parentMap = map[string]interface{}{}
+	var parentMap map[string]interface{}
 	var tryInt int
 	var tryString string
 
@@ -1906,6 +2357,12 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		case map[string]int:
 			j.blob = map[string]interface{}{}
 			for k, v := range value.(map[string]int) {
+				j.blob[k] = v
+			}
+			return nil
+		case map[string]int8:
+			j.blob = map[string]interface{}{}
+			for k, v := range value.(map[string]int8) {
 				j.blob[k] = v
 			}
 			return nil
@@ -1936,6 +2393,12 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		case map[string]uint:
 			j.blob = map[string]interface{}{}
 			for k, v := range value.(map[string]uint) {
+				j.blob[k] = v
+			}
+			return nil
+		case map[string]uint8:
+			j.blob = map[string]interface{}{}
+			for k, v := range value.(map[string]uint8) {
 				j.blob[k] = v
 			}
 			return nil

@@ -75,7 +75,7 @@ func (j *JSON) GetKeys(keys ...interface{}) (ret []string) {
 func (j *JSON) HasKey(keys ...interface{}) bool {
 	var e error
 	_, e = j.nestedGetKey(keys)
-	return (e == nil)
+	return e == nil
 }
 
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {

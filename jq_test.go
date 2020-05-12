@@ -219,6 +219,7 @@ func TestGetFloat(t *testing.T) {
 
 func TestGetInt(t *testing.T) {
 	var actual int
+	var actual8 uint8
 	var e error
 	var expected string
 	var j *jq.JSON
@@ -227,6 +228,11 @@ func TestGetInt(t *testing.T) {
 
 	if actual = j.GetInt("c"); actual != 1234 {
 		t.Errorf("got %d; want: 1234", actual)
+	}
+
+	// 210 b/c 1234 is much larger than uint8 (210 + 1024 == 1234)
+	if actual8 = j.GetUint8("c"); actual8 != 210 {
+		t.Errorf("got %d; want: 210", actual8)
 	}
 
 	if actual = j.GetInt("b"); actual != 0 {
@@ -246,7 +252,7 @@ func TestGetInt(t *testing.T) {
 }
 
 func TestGetMap(t *testing.T) {
-	var actual = map[string]interface{}{}
+	var actual map[string]interface{}
 	var e error
 	var expected string
 	var j *jq.JSON
@@ -404,7 +410,7 @@ func TestSet(t *testing.T) {
 	var e error
 	var expected string
 	var j *jq.JSON
-	var newMap = map[string]interface{}{}
+	var newMap map[string]interface{}
 
 	j, _ = jq.New(json)
 
