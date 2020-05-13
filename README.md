@@ -1,5 +1,7 @@
 # jq
 
+[![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/jq)](https://goreportcard.com/report/gitlab.com/mjwhitta/jq)
+
 ## What is this?
 
 This Go module allows you to parse JSON blobs in a "sane" manner.

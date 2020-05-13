@@ -16,6 +16,7 @@ type JSON struct {
 func New(blob ...string) (j *JSON, e error) {
 	j = &JSON{blob: map[string]interface{}{}, escape: false}
 	e = j.SetBlob(strings.Join(blob, ""))
+
 	return
 }
 
@@ -60,6 +61,7 @@ func (j *JSON) GetBlob(params ...string) (ret string, e error) {
 	}
 
 	ret = strings.TrimSpace(blob.String())
+
 	return
 }
 
@@ -67,6 +69,7 @@ func (j *JSON) GetBlob(params ...string) (ret string, e error) {
 // returns an array or map.
 func (j *JSON) GetKeys(keys ...interface{}) (ret []string) {
 	ret, _ = j.MustGetKeys(keys...)
+
 	return
 }
 
@@ -74,8 +77,107 @@ func (j *JSON) GetKeys(keys ...interface{}) (ret []string) {
 // false otherwise.
 func (j *JSON) HasKey(keys ...interface{}) bool {
 	var e error
+
 	_, e = j.nestedGetKey(keys)
+
 	return e == nil
+}
+
+// MustGetArray will return an array for the specified key(s) as an
+// []interface{}.
+func (j *JSON) MustGetArray(
+	keys ...interface{},
+) (ret []interface{}, e error) {
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	switch val.(type) {
+	case []bool, []string:
+		ret = mustGetArrayAsInterface(val)
+	case []float32, []float64:
+		ret = mustGetFloatArrayAsInterface(val)
+	case []int, []int8, []int16, []int32, []int64:
+		ret = mustGetIntArrayAsInterface(val)
+	case []uint, []uint8, []uint16, []uint32, []uint64:
+		ret = mustGetUintArrayAsInterface(val)
+	case []interface{}:
+		ret = val.([]interface{})
+	default:
+		e = fmt.Errorf("Key %v is not a []interface{}", keys)
+	}
+
+	return
+}
+
+// MustGetKeys will return a list of valid keys if the specified key
+// returns an array or map.
+func (j *JSON) MustGetKeys(
+	keys ...interface{},
+) (ret []string, e error) {
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	switch val.(type) {
+	case map[string]bool, map[string]string, map[string]interface{}:
+		ret = mustGetMapKeys(val)
+	case map[string]float32, map[string]float64:
+		ret = mustGetFloatMapKeys(val)
+	case map[string]int, map[string]int8, map[string]int16,
+		map[string]int32, map[string]int64:
+		ret = mustGetIntMapKeys(val)
+	case map[string]uint, map[string]uint8, map[string]uint16,
+		map[string]uint32, map[string]uint64:
+		ret = mustGetUintMapKeys(val)
+	case []bool, []string, []interface{}:
+		ret = mustGetArrayKeys(val)
+	case []float32, []float64:
+		ret = mustGetFloatArrayKeys(val)
+	case []int, []int8, []int16, []int32, []int64:
+		ret = mustGetIntArrayKeys(val)
+	case []uint, []uint8, []uint16, []uint32, []uint64:
+		ret = mustGetUintArrayKeys(val)
+	default:
+		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
+	}
+
+	return
+}
+
+// MustGetMap will return a map for the specified key(s) as a
+// map[string]interface{}.
+func (j *JSON) MustGetMap(
+	keys ...interface{},
+) (ret map[string]interface{}, e error) {
+	var val interface{}
+
+	if val, e = j.nestedGetKey(keys); e != nil {
+		return
+	}
+
+	switch val.(type) {
+	case map[string]bool, map[string]string:
+		ret = mustGetMapAsInterface(val)
+	case map[string]float32, map[string]float64:
+		ret = mustGetFloatMapAsInterface(val)
+	case map[string]int, map[string]int8, map[string]int16,
+		map[string]int32, map[string]int64:
+		ret = mustGetIntMapAsInterface(val)
+	case map[string]uint, map[string]uint8, map[string]uint16,
+		map[string]uint32, map[string]uint64:
+		ret = mustGetUintMapAsInterface(val)
+	case map[string]interface{}:
+		ret = val.(map[string]interface{})
+	default:
+		e = fmt.Errorf("Key %v is not a map[string]interface{}", keys)
+	}
+
+	return
 }
 
 func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
@@ -100,6 +202,71 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 	}
 
 	return val, nil
+}
+
+// Set will set the specified value for the specified key in the JSON
+// blob.
+func (j *JSON) Set(value interface{}, keys ...interface{}) error {
+	var e error
+	var parentArr []interface{}
+	var parentMap map[string]interface{}
+	var tryInt int
+	var tryString string
+
+	if len(keys) == 0 {
+		switch value.(type) {
+		case map[string]bool, map[string]string:
+			j.blob = mustGetMapAsInterface(value)
+		case map[string]float32, map[string]float64:
+			j.blob = mustGetFloatMapAsInterface(value)
+		case map[string]int, map[string]int8, map[string]int16,
+			map[string]int32, map[string]int64:
+			j.blob = mustGetIntMapAsInterface(value)
+		case map[string]uint, map[string]uint8, map[string]uint16,
+			map[string]uint32, map[string]uint64:
+			j.blob = mustGetUintMapAsInterface(value)
+		case map[string]interface{}:
+			j.blob = value.(map[string]interface{})
+		default:
+			e = fmt.Errorf("Value is not a map[string]interface{}")
+		}
+
+		return e
+	} else if len(keys) == 1 {
+		if tryString, e = asString(keys, keys[0]); e != nil {
+			return e
+		}
+
+		j.blob[tryString] = value
+		return nil
+	}
+
+	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
+		return e
+	}
+
+	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
+	if e == nil {
+		tryString, e = asString(keys, keys[len(keys)-1])
+		if e != nil {
+			return e
+		}
+
+		parentMap[tryString] = value
+		return j.Set(parentMap, keys[0:len(keys)-1]...)
+	}
+
+	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
+	if e == nil {
+		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
+			return e
+		}
+
+		parentArr[tryInt] = value
+		return j.Set(parentArr, keys[0:len(keys)-1]...)
+	}
+
+	return fmt.Errorf("Key %v not found", keys)
 }
 
 // SetBlob will replace the underlying map[string]interface{} with a
@@ -129,5 +296,6 @@ func (j *JSON) SetEscapeHTML(escape bool) {
 // String will return a string representation of JSON instance.
 func (j *JSON) String() (ret string) {
 	ret, _ = j.GetBlob("  ")
+
 	return
 }

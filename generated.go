@@ -33,162 +33,6 @@ func (j *JSON) MustGet(keys ...interface{}) (interface{}, error) {
 	return j.nestedGetKey(keys)
 }
 
-// MustGetArray will return an array for the specified key(s) as an
-// []interface{}.
-func (j *JSON) MustGetArray(
-	keys ...interface{},
-) (ret []interface{}, e error) {
-	var val interface{}
-
-	if val, e = j.nestedGetKey(keys); e != nil {
-		return ret, e
-	}
-
-	switch val.(type) {
-	case []bool:
-		for _, v := range val.([]bool) {
-			ret = append(ret, v)
-		}
-	case []float32:
-		for _, v := range val.([]float32) {
-			ret = append(ret, v)
-		}
-	case []float64:
-		for _, v := range val.([]float64) {
-			ret = append(ret, v)
-		}
-	case []int:
-		for _, v := range val.([]int) {
-			ret = append(ret, v)
-		}
-	case []int8:
-		for _, v := range val.([]int8) {
-			ret = append(ret, v)
-		}
-	case []int16:
-		for _, v := range val.([]int16) {
-			ret = append(ret, v)
-		}
-	case []int32:
-		for _, v := range val.([]int32) {
-			ret = append(ret, v)
-		}
-	case []int64:
-		for _, v := range val.([]int64) {
-			ret = append(ret, v)
-		}
-	case []string:
-		for _, v := range val.([]string) {
-			ret = append(ret, v)
-		}
-	case []uint:
-		for _, v := range val.([]uint) {
-			ret = append(ret, v)
-		}
-	case []uint8:
-		for _, v := range val.([]uint8) {
-			ret = append(ret, v)
-		}
-	case []uint16:
-		for _, v := range val.([]uint16) {
-			ret = append(ret, v)
-		}
-	case []uint32:
-		for _, v := range val.([]uint32) {
-			ret = append(ret, v)
-		}
-	case []uint64:
-		for _, v := range val.([]uint64) {
-			ret = append(ret, v)
-		}
-	case []interface{}:
-		ret = val.([]interface{})
-	default:
-		e = fmt.Errorf("Key %v is not a []interface{}", keys)
-	}
-
-	return
-}
-
-// MustGetMap will return a map for the specified key(s) as a
-// map[string]interface{}.
-func (j *JSON) MustGetMap(
-	keys ...interface{},
-) (ret map[string]interface{}, e error) {
-	var val interface{}
-
-	ret = map[string]interface{}{}
-
-	if val, e = j.nestedGetKey(keys); e != nil {
-		return
-	}
-
-	switch val.(type) {
-	case map[string]bool:
-		for k, v := range val.(map[string]bool) {
-			ret[k] = v
-		}
-	case map[string]float32:
-		for k, v := range val.(map[string]float32) {
-			ret[k] = v
-		}
-	case map[string]float64:
-		for k, v := range val.(map[string]float64) {
-			ret[k] = v
-		}
-	case map[string]int:
-		for k, v := range val.(map[string]int) {
-			ret[k] = v
-		}
-	case map[string]int8:
-		for k, v := range val.(map[string]int8) {
-			ret[k] = v
-		}
-	case map[string]int16:
-		for k, v := range val.(map[string]int16) {
-			ret[k] = v
-		}
-	case map[string]int32:
-		for k, v := range val.(map[string]int32) {
-			ret[k] = v
-		}
-	case map[string]int64:
-		for k, v := range val.(map[string]int64) {
-			ret[k] = v
-		}
-	case map[string]string:
-		for k, v := range val.(map[string]string) {
-			ret[k] = v
-		}
-	case map[string]uint:
-		for k, v := range val.(map[string]uint) {
-			ret[k] = v
-		}
-	case map[string]uint8:
-		for k, v := range val.(map[string]uint8) {
-			ret[k] = v
-		}
-	case map[string]uint16:
-		for k, v := range val.(map[string]uint16) {
-			ret[k] = v
-		}
-	case map[string]uint32:
-		for k, v := range val.(map[string]uint32) {
-			ret[k] = v
-		}
-	case map[string]uint64:
-		for k, v := range val.(map[string]uint64) {
-			ret[k] = v
-		}
-	case map[string]interface{}:
-		ret = val.(map[string]interface{})
-	default:
-		e = fmt.Errorf("Key %v is not a map[string]interface{}", keys)
-	}
-
-	return
-}
-
 func asBool(
 	keys []interface{},
 	v interface{},
@@ -2088,19 +1932,6 @@ func mustGetIntArrayKeys(
 	return
 }
 
-func mustGetStringArrayKeys(
-	val interface{},
-) (ret []string) {
-	switch val.(type) {
-	case []string:
-		for i := 0; i < len(val.([]string)); i++ {
-			ret = append(ret, strconv.Itoa(i))
-		}
-	}
-
-	return
-}
-
 func mustGetUintArrayKeys(
 	val interface{},
 ) (ret []string) {
@@ -2124,6 +1955,98 @@ func mustGetUintArrayKeys(
 	case []uint64:
 		for i := 0; i < len(val.([]uint64)); i++ {
 			ret = append(ret, strconv.Itoa(i))
+		}
+	}
+
+	return
+}
+
+func mustGetArrayAsInterface(
+	val interface{},
+) (ret []interface{}) {
+	switch val.(type) {
+	case []bool:
+		for _, v := range val.([]bool) {
+			ret = append(ret, v)
+		}
+	case []string:
+		for _, v := range val.([]string) {
+			ret = append(ret, v)
+		}
+	}
+
+	return
+}
+
+func mustGetFloatArrayAsInterface(
+	val interface{},
+) (ret []interface{}) {
+	switch val.(type) {
+	case []float32:
+		for _, v := range val.([]float32) {
+			ret = append(ret, v)
+		}
+	case []float64:
+		for _, v := range val.([]float64) {
+			ret = append(ret, v)
+		}
+	}
+
+	return
+}
+
+func mustGetIntArrayAsInterface(
+	val interface{},
+) (ret []interface{}) {
+	switch val.(type) {
+	case []int:
+		for _, v := range val.([]int) {
+			ret = append(ret, v)
+		}
+	case []int8:
+		for _, v := range val.([]int8) {
+			ret = append(ret, v)
+		}
+	case []int16:
+		for _, v := range val.([]int16) {
+			ret = append(ret, v)
+		}
+	case []int32:
+		for _, v := range val.([]int32) {
+			ret = append(ret, v)
+		}
+	case []int64:
+		for _, v := range val.([]int64) {
+			ret = append(ret, v)
+		}
+	}
+
+	return
+}
+
+func mustGetUintArrayAsInterface(
+	val interface{},
+) (ret []interface{}) {
+	switch val.(type) {
+	case []uint:
+		for _, v := range val.([]uint) {
+			ret = append(ret, v)
+		}
+	case []uint8:
+		for _, v := range val.([]uint8) {
+			ret = append(ret, v)
+		}
+	case []uint16:
+		for _, v := range val.([]uint16) {
+			ret = append(ret, v)
+		}
+	case []uint32:
+		for _, v := range val.([]uint32) {
+			ret = append(ret, v)
+		}
+	case []uint64:
+		for _, v := range val.([]uint64) {
+			ret = append(ret, v)
 		}
 	}
 
@@ -2227,29 +2150,6 @@ func mustGetIntMapKeys(
 	return
 }
 
-func mustGetStringMapKeys(
-	val interface{},
-) (ret []string) {
-	var less = func(i, j int) bool {
-		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
-			return ret[i] < ret[j]
-		}
-
-		return strings.ToLower(ret[i]) < strings.ToLower(ret[j])
-	}
-	switch val.(type) {
-	case map[string]string:
-		for k := range val.(map[string]string) {
-			ret = append(ret, k)
-		}
-	}
-
-	if !sort.SliceIsSorted(ret, less) {
-		sort.SliceStable(ret, less)
-	}
-	return
-}
-
 func mustGetUintMapKeys(
 	val interface{},
 ) (ret []string) {
@@ -2289,176 +2189,98 @@ func mustGetUintMapKeys(
 	return
 }
 
-// MustGetKeys will return a list of valid keys if the specified key
-// returns an array or map.
-func (j *JSON) MustGetKeys(
-	keys ...interface{},
-) (ret []string, e error) {
-	var val interface{}
-
-	if val, e = j.nestedGetKey(keys); e != nil {
-		return
-	}
-
+func mustGetMapAsInterface(
+	val interface{},
+) (ret map[string]interface{}) {
+	ret = map[string]interface{}{}
 	switch val.(type) {
-	case []bool, []string, []interface{}:
-		ret = mustGetArrayKeys(val)
-	case []float32, []float64:
-		ret = mustGetFloatArrayKeys(val)
-	case []int, []int8, []int16, []int32, []int64:
-		ret = mustGetIntArrayKeys(val)
-	case []uint, []uint8, []uint16, []uint32, []uint64:
-		ret = mustGetUintArrayKeys(val)
-	case map[string]bool, map[string]string, map[string]interface{}:
-		ret = mustGetMapKeys(val)
-	case map[string]float32, map[string]float64:
-		ret = mustGetFloatMapKeys(val)
-	case map[string]int, map[string]int8, map[string]int16,
-		map[string]int32, map[string]int64:
-		ret = mustGetIntMapKeys(val)
-	case map[string]uint, map[string]uint8, map[string]uint16,
-		map[string]uint32, map[string]uint64:
-		ret = mustGetUintMapKeys(val)
-	default:
-		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
+	case map[string]bool:
+		for k, v := range val.(map[string]bool) {
+			ret[k] = v
+		}
+	case map[string]string:
+		for k, v := range val.(map[string]string) {
+			ret[k] = v
+		}
 	}
+
 	return
 }
 
-// Set will set the specified value for the specified key in the JSON
-// blob.
-func (j *JSON) Set(value interface{}, keys ...interface{}) error {
-	var e error
-	var parentArr []interface{}
-	var parentMap map[string]interface{}
-	var tryInt int
-	var tryString string
-
-	if len(keys) == 0 {
-		switch value.(type) {
-		case map[string]bool:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]bool) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]float32:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]float32) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]float64:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]float64) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]int:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]int) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]int8:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]int8) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]int16:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]int16) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]int32:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]int32) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]int64:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]int64) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]string:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]string) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]uint:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]uint) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]uint8:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]uint8) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]uint16:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]uint16) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]uint32:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]uint32) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]uint64:
-			j.blob = map[string]interface{}{}
-			for k, v := range value.(map[string]uint64) {
-				j.blob[k] = v
-			}
-			return nil
-		case map[string]interface{}:
-			j.blob = value.(map[string]interface{})
-			return nil
-		default:
-			return fmt.Errorf("Value is not a map[string]interface{}")
+func mustGetFloatMapAsInterface(
+	val interface{},
+) (ret map[string]interface{}) {
+	ret = map[string]interface{}{}
+	switch val.(type) {
+	case map[string]float32:
+		for k, v := range val.(map[string]float32) {
+			ret[k] = v
 		}
-	} else if len(keys) == 1 {
-		if tryString, e = asString(keys, keys[0]); e != nil {
-			return e
+	case map[string]float64:
+		for k, v := range val.(map[string]float64) {
+			ret[k] = v
 		}
-
-		j.blob[tryString] = value
-		return nil
 	}
 
-	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
-		return e
-	}
+	return
+}
 
-	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
-	if e == nil {
-		tryString, e = asString(keys, keys[len(keys)-1])
-		if e != nil {
-			return e
+func mustGetIntMapAsInterface(
+	val interface{},
+) (ret map[string]interface{}) {
+	ret = map[string]interface{}{}
+	switch val.(type) {
+	case map[string]int:
+		for k, v := range val.(map[string]int) {
+			ret[k] = v
 		}
-
-		parentMap[tryString] = value
-		return j.Set(parentMap, keys[0:len(keys)-1]...)
-	}
-
-	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
-	if e == nil {
-		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
-			return e
+	case map[string]int8:
+		for k, v := range val.(map[string]int8) {
+			ret[k] = v
 		}
-
-		parentArr[tryInt] = value
-		return j.Set(parentArr, keys[0:len(keys)-1]...)
+	case map[string]int16:
+		for k, v := range val.(map[string]int16) {
+			ret[k] = v
+		}
+	case map[string]int32:
+		for k, v := range val.(map[string]int32) {
+			ret[k] = v
+		}
+	case map[string]int64:
+		for k, v := range val.(map[string]int64) {
+			ret[k] = v
+		}
 	}
 
-	return fmt.Errorf("Key %v not found", keys)
+	return
+}
+
+func mustGetUintMapAsInterface(
+	val interface{},
+) (ret map[string]interface{}) {
+	ret = map[string]interface{}{}
+	switch val.(type) {
+	case map[string]uint:
+		for k, v := range val.(map[string]uint) {
+			ret[k] = v
+		}
+	case map[string]uint8:
+		for k, v := range val.(map[string]uint8) {
+			ret[k] = v
+		}
+	case map[string]uint16:
+		for k, v := range val.(map[string]uint16) {
+			ret[k] = v
+		}
+	case map[string]uint32:
+		for k, v := range val.(map[string]uint32) {
+			ret[k] = v
+		}
+	case map[string]uint64:
+		for k, v := range val.(map[string]uint64) {
+			ret[k] = v
+		}
+	}
+
+	return
 }

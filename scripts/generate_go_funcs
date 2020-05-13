@@ -23,6 +23,65 @@ subinfo() { echo -e "${color:+\e[36m}[=] $*\e[0m"; }
 warn() { echo -e "${color:+\e[33m}[-] $*\e[0m"; }
 ### Helpers end
 
+generate_as_interface_func() {
+    local datatype="$1" && shift
+    local family="$1" && shift
+
+    cat <<EOF
+func mustGet${family}${datatype}AsInterface(
+    val interface{},
+EOF
+
+    case "$datatype" in
+        "Array")
+            cat <<EOF
+) (ret []interface{}) {
+EOF
+            ;;
+        "Map")
+            cat <<EOF
+) (ret map[string]interface{}) {
+    ret = map[string]interface{}{}
+EOF
+            ;;
+    esac
+
+    cat <<EOF
+	switch val.(type) {
+EOF
+
+    case "$datatype" in
+        "Array")
+            for thetype in "$@"; do
+                cat <<EOF
+	case []$thetype:
+        for _, v := range val.([]$thetype) {
+            ret = append(ret, v)
+        }
+EOF
+            done; unset thetype
+            ;;
+        "Map")
+            for thetype in "$@"; do
+                cat <<EOF
+	case map[string]$thetype:
+        for k, v := range val.(map[string]$thetype) {
+            ret[k] = v
+        }
+EOF
+            done; unset thetype
+            ;;
+    esac
+
+    cat <<EOF
+    }
+
+	return
+}
+
+EOF
+}
+
 generate_keys_func() {
     local datatype="$1" && shift
     local family="$1" && shift
@@ -193,86 +252,6 @@ func (j *JSON) GetMap(keys ...interface{}) (ret map[string]$rtype) {
 // MustGet will return the value for the specified key(s) as a $rtype.
 func (j *JSON) MustGet(keys ...interface{}) ($rtype, error) {
     return j.nestedGetKey(keys)
-}
-
-// MustGetArray will return an array for the specified key(s) as an
-// []$rtype.
-func (j *JSON) MustGetArray(
-    keys ...interface{},
-) (ret []$rtype, e error) {
-    var val interface{}
-
-    if val, e = j.nestedGetKey(keys); e != nil {
-        return ret, e
-    }
-
-    switch val.(type) {
-EOF
-
-    for arrtype in \
-        bool \
-        float32 float64 \
-        int int8 int16 int32 int64 \
-        string \
-        uint uint8 uint16 uint32 uint64
-    do
-        cat <<EOF
-    case []$arrtype:
-        for _, v := range val.([]$arrtype) {
-            ret = append(ret, v)
-        }
-EOF
-    done; unset maptype
-
-    cat <<EOF
-    case []$rtype:
-        ret = val.([]$rtype)
-    default:
-        e = fmt.Errorf("Key %v is not a []$rtype", keys)
-    }
-
-    return
-}
-
-// MustGetMap will return a map for the specified key(s) as a
-// map[string]$rtype.
-func (j *JSON) MustGetMap(
-    keys ...interface{},
-) (ret map[string]$rtype, e error) {
-    var val interface{}
-
-    ret = map[string]$rtype{}
-
-    if val, e = j.nestedGetKey(keys); e != nil {
-        return
-    }
-
-    switch val.(type) {
-EOF
-
-    for maptype in \
-        bool \
-        float32 float64 \
-        int int8 int16 int32 int64 \
-        string \
-        uint uint8 uint16 uint32 uint64
-    do
-        cat <<EOF
-    case map[string]$maptype:
-        for k, v := range val.(map[string]$maptype) {
-            ret[k] = v
-        }
-EOF
-    done; unset maptype
-
-    cat <<EOF
-    case map[string]$rtype:
-        ret = val.(map[string]$rtype)
-    default:
-        e = fmt.Errorf("Key %v is not a map[string]$rtype", keys)
-    }
-
-    return
 }
 
 EOF
@@ -451,119 +430,17 @@ $(
         generate_keys_func "$datatype" "Float" float32 float64
         generate_keys_func "$datatype" "Int" int int8 int16 int32 \
             int64
-        generate_keys_func "$datatype" "String" string
         generate_keys_func "$datatype" "Uint" uint uint8 uint16 \
             uint32 uint64
+
+        generate_as_interface_func "$datatype" "" bool string
+        generate_as_interface_func "$datatype" "Float" float32 float64
+        generate_as_interface_func "$datatype" "Int" int int8 int16 \
+            int32 int64
+        generate_as_interface_func "$datatype" "Uint" uint uint8 \
+            uint16 uint32 uint64
     done; unset datatype
 )
-
-// MustGetKeys will return a list of valid keys if the specified key
-// returns an array or map.
-func (j *JSON) MustGetKeys(
-	keys ...interface{},
-) (ret []string, e error) {
-	var val interface{}
-
-	if val, e = j.nestedGetKey(keys); e != nil {
-		return
-	}
-
-	switch val.(type) {
-	case []bool, []string, []interface{}:
-        ret = mustGetArrayKeys(val)
-    case []float32, []float64:
-        ret = mustGetFloatArrayKeys(val)
-	case []int, []int8, []int16, []int32, []int64:
-        ret = mustGetIntArrayKeys(val)
-	case []uint, []uint8, []uint16, []uint32, []uint64:
-        ret = mustGetUintArrayKeys(val)
-	case map[string]bool, map[string]string, map[string]interface{}:
-        ret = mustGetMapKeys(val)
-    case map[string]float32, map[string]float64:
-        ret = mustGetFloatMapKeys(val)
-	case map[string]int, map[string]int8, map[string]int16,
-		map[string]int32, map[string]int64:
-        ret = mustGetIntMapKeys(val)
-	case map[string]uint, map[string]uint8, map[string]uint16,
-		map[string]uint32, map[string]uint64:
-        ret = mustGetUintMapKeys(val)
-	default:
-		e = fmt.Errorf("Key %v has no valid sub-keys", keys)
-	}
-	return
-}
-
-// Set will set the specified value for the specified key in the JSON
-// blob.
-func (j *JSON) Set(value interface{}, keys ...interface{}) error {
-	var e error
-	var parentArr []interface{}
-	var parentMap map[string]interface{}
-	var tryInt int
-	var tryString string
-
-	if len(keys) == 0 {
-		switch value.(type) {
-$(
-    for maptype in \
-        bool \
-        float32 float64 \
-        int int8 int16 int32 int64 \
-        string \
-        uint uint8 uint16 uint32 uint64
-    do
-        cat <<EOC
-		case map[string]$maptype:
-            j.blob = map[string]interface{}{}
-            for k, v := range value.(map[string]$maptype) {
-                j.blob[k] = v
-            }
-			return nil
-EOC
-    done; unset maptype
-)
-		case map[string]interface{}:
-			j.blob = value.(map[string]interface{})
-			return nil
-		default:
-			return fmt.Errorf("Value is not a map[string]interface{}")
-		}
-	} else if len(keys) == 1 {
-		if tryString, e = asString(keys, keys[0]); e != nil {
-			return e
-		}
-
-		j.blob[tryString] = value
-		return nil
-	}
-
-	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
-		return e
-	}
-
-	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
-	if e == nil {
-		tryString, e = asString(keys, keys[len(keys)-1])
-		if e != nil {
-			return e
-		}
-
-		parentMap[tryString] = value
-		return j.Set(parentMap, keys[0:len(keys)-1]...)
-	}
-
-	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
-	if e == nil {
-		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
-			return e
-		}
-
-		parentArr[tryInt] = value
-		return j.Set(parentArr, keys[0:len(keys)-1]...)
-	}
-
-	return fmt.Errorf("Key %v not found", keys)
-}
 EOF
 
 go fmt "$file"
