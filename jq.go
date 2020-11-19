@@ -275,7 +275,7 @@ func (j *JSON) SetBlob(blob ...string) (e error) {
 	var blobStr = strings.TrimSpace(strings.Join(blob, ""))
 	var dec *json.Decoder
 
-	if len(blobStr) == 0 {
+	if blobStr == "" {
 		blobStr = "{}"
 	}
 
