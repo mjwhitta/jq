@@ -13,7 +13,7 @@ This Go module allows you to parse JSON blobs in a "sane" manner.
 Open a terminal and run the following:
 
 ```
-$ go get -u gitlab.com/mjwhitta/jq
+$ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/jq
 ```
 
 ## Usage
