@@ -104,7 +104,7 @@ EOF
         "Map")
             cat <<EOF
 	var less = func(i, j int) bool {
-		if strings.ToLower(ret[i]) == strings.ToLower(ret[j]) {
+        if strings.EqualFold(ret[i], ret[j]) {
             return ret[i] < ret[j]
         }
 
@@ -179,7 +179,7 @@ func as${thetype^}(
     case $thetype:
         ret = v.($thetype)
     default:
-        e = fmt.Errorf("Key %v is not a $thetype", keys)
+        e = fmt.Errorf("key %v is not a $thetype", keys)
     }
     return
 }
@@ -208,7 +208,7 @@ EOF
 
     cat <<EOF
     default:
-        e = fmt.Errorf("Key %v is not a $thetype", keys)
+        e = fmt.Errorf("key %v is not a $thetype", keys)
     }
     return
 }
@@ -225,7 +225,7 @@ func as${thetype^}(
     case $thetype:
         ret = v.($thetype)
     default:
-        e = fmt.Errorf("Key %v is not a $thetype", keys)
+        e = fmt.Errorf("key %v is not a $thetype", keys)
     }
     return
 }
@@ -322,7 +322,7 @@ func (j *JSON) MustGet${thetype^}Array(
     }
 
     if _, ok := val.([]interface{}); !ok {
-        e = fmt.Errorf("Key %v is not a []$rtype", keys)
+        e = fmt.Errorf("key %v is not a []$rtype", keys)
         return
     }
 

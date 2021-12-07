@@ -131,7 +131,7 @@ func TestGetArray(t *testing.T) {
 		t.Errorf("got: %v; want: []", actual)
 	}
 
-	expected = "Key [a] is not a []interface{}"
+	expected = "key [a] is not a []interface{}"
 	if _, e = j.MustGetArray("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -185,7 +185,7 @@ func TestGetBool(t *testing.T) {
 		t.Errorf("got: true; want: false")
 	}
 
-	expected = "Key [b] is not a bool"
+	expected = "key [b] is not a bool"
 	if _, e = j.MustGetBool("b"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -209,7 +209,7 @@ func TestGetFloat(t *testing.T) {
 		t.Errorf("got: %0.1f; want: 0", actual)
 	}
 
-	expected = "Key [a] is not a float64"
+	expected = "key [a] is not a float64"
 	if _, e = j.MustGetFloat64("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -239,7 +239,7 @@ func TestGetInt(t *testing.T) {
 		t.Errorf("got: %d; want: 0", actual)
 	}
 
-	expected = "Key [b] is not a int"
+	expected = "key [b] is not a int"
 	if _, e = j.MustGetInt("b"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -275,7 +275,7 @@ func TestGetMap(t *testing.T) {
 		t.Errorf("got: %+v; want: map[]", actual)
 	}
 
-	expected = "Key [a] is not a map[string]interface{}"
+	expected = "key [a] is not a map[string]interface{}"
 	if _, e = j.MustGetMap("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -299,7 +299,7 @@ func TestGetString(t *testing.T) {
 		t.Errorf("got: %s; want: empty string", actual)
 	}
 
-	expected = "Key [a] is not a string"
+	expected = "key [a] is not a string"
 	if _, e = j.MustGetString("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -329,7 +329,7 @@ func TestGetStringArray(t *testing.T) {
 		t.Errorf("got: %v; want: []", actual)
 	}
 
-	expected = "Key [a] is not a []string"
+	expected = "key [a] is not a []string"
 	if _, e = j.MustGetStringArray("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -397,7 +397,7 @@ func TestKeys(t *testing.T) {
 		t.Errorf("got: %v; want: []", actual)
 	}
 
-	expected = "Key [a] has no valid sub-keys"
+	expected = "key [a] has no valid sub-keys"
 	if _, e = j.MustGetKeys("a"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
@@ -421,21 +421,21 @@ func TestSet(t *testing.T) {
 		t.Errorf("got: %s; want: %s", actual, expected)
 	}
 
-	expected = "Key [d asdf] is not a int"
+	expected = "key [d asdf] is not a int"
 	if e = j.Set("asdf", "d", "asdf"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
 		t.Errorf("got: %s; want: %s", e.Error(), expected)
 	}
 
-	expected = "Key [e 0] is not a string"
+	expected = "key [e 0] is not a string"
 	if e = j.Set("asdf", "e", 0); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
 		t.Errorf("got: %s; want: %s", e.Error(), expected)
 	}
 
-	expected = "Key [e asdf] not found"
+	expected = "key [e asdf] not found"
 	if e = j.Set("asdf", "e", "asdf", "blah"); e == nil {
 		t.Errorf("got: nil; want: %s", expected)
 	} else if e.Error() != expected {
