@@ -41,7 +41,7 @@ func asBool(
 	case bool:
 		ret = v.(bool)
 	default:
-		e = fmt.Errorf("key %v is not a bool", keys)
+		e = fmt.Errorf("jq: key %v is not a bool", keys)
 	}
 	return
 }
@@ -102,7 +102,7 @@ func (j *JSON) MustGetBoolArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []bool", keys)
+		e = fmt.Errorf("jq: key %v is not a []bool", keys)
 		return
 	}
 
@@ -175,7 +175,7 @@ func asFloat32(
 	case uint64:
 		ret = float32(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a float32", keys)
+		e = fmt.Errorf("jq: key %v is not a float32", keys)
 	}
 	return
 }
@@ -236,7 +236,7 @@ func (j *JSON) MustGetFloat32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []float32", keys)
+		e = fmt.Errorf("jq: key %v is not a []float32", keys)
 		return
 	}
 
@@ -309,7 +309,7 @@ func asFloat64(
 	case uint64:
 		ret = float64(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a float64", keys)
+		e = fmt.Errorf("jq: key %v is not a float64", keys)
 	}
 	return
 }
@@ -370,7 +370,7 @@ func (j *JSON) MustGetFloat64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []float64", keys)
+		e = fmt.Errorf("jq: key %v is not a []float64", keys)
 		return
 	}
 
@@ -443,7 +443,7 @@ func asInt(
 	case uint64:
 		ret = int(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a int", keys)
+		e = fmt.Errorf("jq: key %v is not a int", keys)
 	}
 	return
 }
@@ -504,7 +504,7 @@ func (j *JSON) MustGetIntArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []int", keys)
+		e = fmt.Errorf("jq: key %v is not a []int", keys)
 		return
 	}
 
@@ -577,7 +577,7 @@ func asInt8(
 	case uint64:
 		ret = int8(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a int8", keys)
+		e = fmt.Errorf("jq: key %v is not a int8", keys)
 	}
 	return
 }
@@ -638,7 +638,7 @@ func (j *JSON) MustGetInt8Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []int8", keys)
+		e = fmt.Errorf("jq: key %v is not a []int8", keys)
 		return
 	}
 
@@ -711,7 +711,7 @@ func asInt16(
 	case uint64:
 		ret = int16(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a int16", keys)
+		e = fmt.Errorf("jq: key %v is not a int16", keys)
 	}
 	return
 }
@@ -772,7 +772,7 @@ func (j *JSON) MustGetInt16Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []int16", keys)
+		e = fmt.Errorf("jq: key %v is not a []int16", keys)
 		return
 	}
 
@@ -845,7 +845,7 @@ func asInt32(
 	case uint64:
 		ret = int32(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a int32", keys)
+		e = fmt.Errorf("jq: key %v is not a int32", keys)
 	}
 	return
 }
@@ -906,7 +906,7 @@ func (j *JSON) MustGetInt32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []int32", keys)
+		e = fmt.Errorf("jq: key %v is not a []int32", keys)
 		return
 	}
 
@@ -979,7 +979,7 @@ func asInt64(
 	case uint64:
 		ret = int64(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a int64", keys)
+		e = fmt.Errorf("jq: key %v is not a int64", keys)
 	}
 	return
 }
@@ -1040,7 +1040,7 @@ func (j *JSON) MustGetInt64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []int64", keys)
+		e = fmt.Errorf("jq: key %v is not a []int64", keys)
 		return
 	}
 
@@ -1091,7 +1091,7 @@ func asString(
 	case string:
 		ret = v.(string)
 	default:
-		e = fmt.Errorf("key %v is not a string", keys)
+		e = fmt.Errorf("jq: key %v is not a string", keys)
 	}
 	return
 }
@@ -1152,7 +1152,7 @@ func (j *JSON) MustGetStringArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []string", keys)
+		e = fmt.Errorf("jq: key %v is not a []string", keys)
 		return
 	}
 
@@ -1225,7 +1225,7 @@ func asUint(
 	case uint64:
 		ret = uint(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a uint", keys)
+		e = fmt.Errorf("jq: key %v is not a uint", keys)
 	}
 	return
 }
@@ -1286,7 +1286,7 @@ func (j *JSON) MustGetUintArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []uint", keys)
+		e = fmt.Errorf("jq: key %v is not a []uint", keys)
 		return
 	}
 
@@ -1359,7 +1359,7 @@ func asUint8(
 	case uint64:
 		ret = uint8(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a uint8", keys)
+		e = fmt.Errorf("jq: key %v is not a uint8", keys)
 	}
 	return
 }
@@ -1420,7 +1420,7 @@ func (j *JSON) MustGetUint8Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []uint8", keys)
+		e = fmt.Errorf("jq: key %v is not a []uint8", keys)
 		return
 	}
 
@@ -1493,7 +1493,7 @@ func asUint16(
 	case uint64:
 		ret = uint16(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a uint16", keys)
+		e = fmt.Errorf("jq: key %v is not a uint16", keys)
 	}
 	return
 }
@@ -1554,7 +1554,7 @@ func (j *JSON) MustGetUint16Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []uint16", keys)
+		e = fmt.Errorf("jq: key %v is not a []uint16", keys)
 		return
 	}
 
@@ -1627,7 +1627,7 @@ func asUint32(
 	case uint64:
 		ret = uint32(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a uint32", keys)
+		e = fmt.Errorf("jq: key %v is not a uint32", keys)
 	}
 	return
 }
@@ -1688,7 +1688,7 @@ func (j *JSON) MustGetUint32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []uint32", keys)
+		e = fmt.Errorf("jq: key %v is not a []uint32", keys)
 		return
 	}
 
@@ -1761,7 +1761,7 @@ func asUint64(
 	case uint64:
 		ret = uint64(v.(uint64))
 	default:
-		e = fmt.Errorf("key %v is not a uint64", keys)
+		e = fmt.Errorf("jq: key %v is not a uint64", keys)
 	}
 	return
 }
@@ -1822,7 +1822,7 @@ func (j *JSON) MustGetUint64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("key %v is not a []uint64", keys)
+		e = fmt.Errorf("jq: key %v is not a []uint64", keys)
 		return
 	}
 

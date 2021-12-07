@@ -106,7 +106,7 @@ func (j *JSON) MustGetArray(
 	case []interface{}:
 		ret = val
 	default:
-		e = fmt.Errorf("key %v is not a []interface{}", keys)
+		e = fmt.Errorf("jq: key %v is not a []interface{}", keys)
 	}
 
 	return
@@ -143,7 +143,7 @@ func (j *JSON) MustGetKeys(
 	case []uint, []uint8, []uint16, []uint32, []uint64:
 		ret = mustGetUintArrayKeys(val)
 	default:
-		e = fmt.Errorf("key %v has no valid sub-keys", keys)
+		e = fmt.Errorf("jq: key %v has no valid sub-keys", keys)
 	}
 
 	return
@@ -174,7 +174,10 @@ func (j *JSON) MustGetMap(
 	case map[string]interface{}:
 		ret = val
 	default:
-		e = fmt.Errorf("key %v is not a map[string]interface{}", keys)
+		e = fmt.Errorf(
+			"jq: key %v is not a map[string]interface{}",
+			keys,
+		)
 	}
 
 	return
@@ -195,7 +198,7 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 		}
 
 		if (e != nil) || (v == nil) {
-			return nil, fmt.Errorf("key %v not found", keys)
+			return nil, fmt.Errorf("jq: key %v not found", keys)
 		}
 
 		val = v
@@ -228,7 +231,9 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		case map[string]interface{}:
 			j.blob = value
 		default:
-			e = fmt.Errorf("value is not a map[string]interface{}")
+			e = fmt.Errorf(
+				"jq: value is not a map[string]interface{}",
+			)
 		}
 
 		return e
@@ -266,7 +271,7 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		return j.Set(parentArr, keys[0:len(keys)-1]...)
 	}
 
-	return fmt.Errorf("key %v not found", keys)
+	return fmt.Errorf("jq: key %v not found", keys)
 }
 
 // SetBlob will replace the underlying map[string]interface{} with a

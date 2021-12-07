@@ -179,7 +179,7 @@ func as${thetype^}(
     case $thetype:
         ret = v.($thetype)
     default:
-        e = fmt.Errorf("key %v is not a $thetype", keys)
+        e = fmt.Errorf("jq: key %v is not a $thetype", keys)
     }
     return
 }
@@ -208,7 +208,7 @@ EOF
 
     cat <<EOF
     default:
-        e = fmt.Errorf("key %v is not a $thetype", keys)
+        e = fmt.Errorf("jq: key %v is not a $thetype", keys)
     }
     return
 }
@@ -225,7 +225,7 @@ func as${thetype^}(
     case $thetype:
         ret = v.($thetype)
     default:
-        e = fmt.Errorf("key %v is not a $thetype", keys)
+        e = fmt.Errorf("jq: key %v is not a $thetype", keys)
     }
     return
 }
@@ -322,7 +322,7 @@ func (j *JSON) MustGet${thetype^}Array(
     }
 
     if _, ok := val.([]interface{}); !ok {
-        e = fmt.Errorf("key %v is not a []$rtype", keys)
+        e = fmt.Errorf("jq: key %v is not a []$rtype", keys)
         return
     }
 
