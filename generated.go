@@ -2,10 +2,11 @@
 package jq
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
+
+	"gitlab.com/mjwhitta/errors"
 )
 
 // Get will return the value for the specified key(s) as a interface{}.
@@ -33,15 +34,12 @@ func (j *JSON) MustGet(keys ...interface{}) (interface{}, error) {
 	return j.nestedGetKey(keys)
 }
 
-func asBool(
-	keys []interface{},
-	v interface{},
-) (ret bool, e error) {
-	switch v.(type) {
+func asBool(keys []interface{}, v interface{}) (ret bool, e error) {
+	switch v := v.(type) {
 	case bool:
-		ret = v.(bool)
+		ret = v
 	default:
-		e = fmt.Errorf("jq: key %v is not a bool", keys)
+		e = errors.Newf("key %v is not of type bool", keys)
 	}
 	return
 }
@@ -62,33 +60,27 @@ func (j *JSON) GetBoolArray(keys ...interface{}) (ret []bool) {
 
 // GetBoolMap will return a map for the specified key(s) as a
 // map[string]bool.
-func (j *JSON) GetBoolMap(
-	keys ...interface{},
-) (ret map[string]bool) {
+func (j *JSON) GetBoolMap(keys ...interface{}) (ret map[string]bool) {
 	ret, _ = j.MustGetBoolMap(keys...)
 	return
 }
 
 // MustGetBool will return the value for the specified key(s) as a
 // bool.
-func (j *JSON) MustGetBool(
-	keys ...interface{},
-) (ret bool, e error) {
+func (j *JSON) MustGetBool(keys ...interface{}) (ret bool, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asBool(keys, val)
+	ret, e = asBool(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetBoolArray will return an array for the specified key(s)
 // as a []bool.
-func (j *JSON) MustGetBoolArray(
-	keys ...interface{},
-) (ret []bool, e error) {
+func (j *JSON) MustGetBoolArray(keys ...interface{}) (ret []bool, e error) {
 	var tmp bool
 	var val interface{}
 
@@ -102,11 +94,12 @@ func (j *JSON) MustGetBoolArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []bool", keys)
+		e = errors.Newf("key %v is not of type []bool", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asBool(keys, v); e != nil {
 			ret = []bool{}
 			return
@@ -119,9 +112,7 @@ func (j *JSON) MustGetBoolArray(
 
 // MustGetBoolMap will return a map for the specified key(s) as a
 // map[string]bool.
-func (j *JSON) MustGetBoolMap(
-	keys ...interface{},
-) (ret map[string]bool, e error) {
+func (j *JSON) MustGetBoolMap(keys ...interface{}) (ret map[string]bool, e error) {
 	var val interface{}
 
 	ret = map[string]bool{}
@@ -136,6 +127,7 @@ func (j *JSON) MustGetBoolMap(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asBool(keys, v); e != nil {
 			ret = map[string]bool{}
 			return
@@ -145,37 +137,34 @@ func (j *JSON) MustGetBoolMap(
 	return
 }
 
-func asFloat32(
-	keys []interface{},
-	v interface{},
-) (ret float32, e error) {
-	switch v.(type) {
+func asFloat32(keys []interface{}, v interface{}) (ret float32, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = float32(v.(float32))
+		ret = float32(v)
 	case float64:
-		ret = float32(v.(float64))
+		ret = float32(v)
 	case int:
-		ret = float32(v.(int))
+		ret = float32(v)
 	case int8:
-		ret = float32(v.(int8))
+		ret = float32(v)
 	case int16:
-		ret = float32(v.(int16))
+		ret = float32(v)
 	case int32:
-		ret = float32(v.(int32))
+		ret = float32(v)
 	case int64:
-		ret = float32(v.(int64))
+		ret = float32(v)
 	case uint:
-		ret = float32(v.(uint))
+		ret = float32(v)
 	case uint8:
-		ret = float32(v.(uint8))
+		ret = float32(v)
 	case uint16:
-		ret = float32(v.(uint16))
+		ret = float32(v)
 	case uint32:
-		ret = float32(v.(uint32))
+		ret = float32(v)
 	case uint64:
-		ret = float32(v.(uint64))
+		ret = float32(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a float32", keys)
+		e = errors.Newf("key %v is not of type float32", keys)
 	}
 	return
 }
@@ -196,33 +185,27 @@ func (j *JSON) GetFloat32Array(keys ...interface{}) (ret []float32) {
 
 // GetFloat32Map will return a map for the specified key(s) as a
 // map[string]float32.
-func (j *JSON) GetFloat32Map(
-	keys ...interface{},
-) (ret map[string]float32) {
+func (j *JSON) GetFloat32Map(keys ...interface{}) (ret map[string]float32) {
 	ret, _ = j.MustGetFloat32Map(keys...)
 	return
 }
 
 // MustGetFloat32 will return the value for the specified key(s) as a
 // float32.
-func (j *JSON) MustGetFloat32(
-	keys ...interface{},
-) (ret float32, e error) {
+func (j *JSON) MustGetFloat32(keys ...interface{}) (ret float32, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asFloat32(keys, val)
+	ret, e = asFloat32(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetFloat32Array will return an array for the specified key(s)
 // as a []float32.
-func (j *JSON) MustGetFloat32Array(
-	keys ...interface{},
-) (ret []float32, e error) {
+func (j *JSON) MustGetFloat32Array(keys ...interface{}) (ret []float32, e error) {
 	var tmp float32
 	var val interface{}
 
@@ -236,11 +219,12 @@ func (j *JSON) MustGetFloat32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []float32", keys)
+		e = errors.Newf("key %v is not of type []float32", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asFloat32(keys, v); e != nil {
 			ret = []float32{}
 			return
@@ -253,9 +237,7 @@ func (j *JSON) MustGetFloat32Array(
 
 // MustGetFloat32Map will return a map for the specified key(s) as a
 // map[string]float32.
-func (j *JSON) MustGetFloat32Map(
-	keys ...interface{},
-) (ret map[string]float32, e error) {
+func (j *JSON) MustGetFloat32Map(keys ...interface{}) (ret map[string]float32, e error) {
 	var val interface{}
 
 	ret = map[string]float32{}
@@ -270,6 +252,7 @@ func (j *JSON) MustGetFloat32Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asFloat32(keys, v); e != nil {
 			ret = map[string]float32{}
 			return
@@ -279,37 +262,34 @@ func (j *JSON) MustGetFloat32Map(
 	return
 }
 
-func asFloat64(
-	keys []interface{},
-	v interface{},
-) (ret float64, e error) {
-	switch v.(type) {
+func asFloat64(keys []interface{}, v interface{}) (ret float64, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = float64(v.(float32))
+		ret = float64(v)
 	case float64:
-		ret = float64(v.(float64))
+		ret = float64(v)
 	case int:
-		ret = float64(v.(int))
+		ret = float64(v)
 	case int8:
-		ret = float64(v.(int8))
+		ret = float64(v)
 	case int16:
-		ret = float64(v.(int16))
+		ret = float64(v)
 	case int32:
-		ret = float64(v.(int32))
+		ret = float64(v)
 	case int64:
-		ret = float64(v.(int64))
+		ret = float64(v)
 	case uint:
-		ret = float64(v.(uint))
+		ret = float64(v)
 	case uint8:
-		ret = float64(v.(uint8))
+		ret = float64(v)
 	case uint16:
-		ret = float64(v.(uint16))
+		ret = float64(v)
 	case uint32:
-		ret = float64(v.(uint32))
+		ret = float64(v)
 	case uint64:
-		ret = float64(v.(uint64))
+		ret = float64(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a float64", keys)
+		e = errors.Newf("key %v is not of type float64", keys)
 	}
 	return
 }
@@ -330,33 +310,27 @@ func (j *JSON) GetFloat64Array(keys ...interface{}) (ret []float64) {
 
 // GetFloat64Map will return a map for the specified key(s) as a
 // map[string]float64.
-func (j *JSON) GetFloat64Map(
-	keys ...interface{},
-) (ret map[string]float64) {
+func (j *JSON) GetFloat64Map(keys ...interface{}) (ret map[string]float64) {
 	ret, _ = j.MustGetFloat64Map(keys...)
 	return
 }
 
 // MustGetFloat64 will return the value for the specified key(s) as a
 // float64.
-func (j *JSON) MustGetFloat64(
-	keys ...interface{},
-) (ret float64, e error) {
+func (j *JSON) MustGetFloat64(keys ...interface{}) (ret float64, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asFloat64(keys, val)
+	ret, e = asFloat64(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetFloat64Array will return an array for the specified key(s)
 // as a []float64.
-func (j *JSON) MustGetFloat64Array(
-	keys ...interface{},
-) (ret []float64, e error) {
+func (j *JSON) MustGetFloat64Array(keys ...interface{}) (ret []float64, e error) {
 	var tmp float64
 	var val interface{}
 
@@ -370,11 +344,12 @@ func (j *JSON) MustGetFloat64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []float64", keys)
+		e = errors.Newf("key %v is not of type []float64", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asFloat64(keys, v); e != nil {
 			ret = []float64{}
 			return
@@ -387,9 +362,7 @@ func (j *JSON) MustGetFloat64Array(
 
 // MustGetFloat64Map will return a map for the specified key(s) as a
 // map[string]float64.
-func (j *JSON) MustGetFloat64Map(
-	keys ...interface{},
-) (ret map[string]float64, e error) {
+func (j *JSON) MustGetFloat64Map(keys ...interface{}) (ret map[string]float64, e error) {
 	var val interface{}
 
 	ret = map[string]float64{}
@@ -404,6 +377,7 @@ func (j *JSON) MustGetFloat64Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asFloat64(keys, v); e != nil {
 			ret = map[string]float64{}
 			return
@@ -413,37 +387,34 @@ func (j *JSON) MustGetFloat64Map(
 	return
 }
 
-func asInt(
-	keys []interface{},
-	v interface{},
-) (ret int, e error) {
-	switch v.(type) {
+func asInt(keys []interface{}, v interface{}) (ret int, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = int(v.(float32))
+		ret = int(v)
 	case float64:
-		ret = int(v.(float64))
+		ret = int(v)
 	case int:
-		ret = int(v.(int))
+		ret = int(v)
 	case int8:
-		ret = int(v.(int8))
+		ret = int(v)
 	case int16:
-		ret = int(v.(int16))
+		ret = int(v)
 	case int32:
-		ret = int(v.(int32))
+		ret = int(v)
 	case int64:
-		ret = int(v.(int64))
+		ret = int(v)
 	case uint:
-		ret = int(v.(uint))
+		ret = int(v)
 	case uint8:
-		ret = int(v.(uint8))
+		ret = int(v)
 	case uint16:
-		ret = int(v.(uint16))
+		ret = int(v)
 	case uint32:
-		ret = int(v.(uint32))
+		ret = int(v)
 	case uint64:
-		ret = int(v.(uint64))
+		ret = int(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a int", keys)
+		e = errors.Newf("key %v is not of type int", keys)
 	}
 	return
 }
@@ -464,33 +435,27 @@ func (j *JSON) GetIntArray(keys ...interface{}) (ret []int) {
 
 // GetIntMap will return a map for the specified key(s) as a
 // map[string]int.
-func (j *JSON) GetIntMap(
-	keys ...interface{},
-) (ret map[string]int) {
+func (j *JSON) GetIntMap(keys ...interface{}) (ret map[string]int) {
 	ret, _ = j.MustGetIntMap(keys...)
 	return
 }
 
 // MustGetInt will return the value for the specified key(s) as a
 // int.
-func (j *JSON) MustGetInt(
-	keys ...interface{},
-) (ret int, e error) {
+func (j *JSON) MustGetInt(keys ...interface{}) (ret int, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asInt(keys, val)
+	ret, e = asInt(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetIntArray will return an array for the specified key(s)
 // as a []int.
-func (j *JSON) MustGetIntArray(
-	keys ...interface{},
-) (ret []int, e error) {
+func (j *JSON) MustGetIntArray(keys ...interface{}) (ret []int, e error) {
 	var tmp int
 	var val interface{}
 
@@ -504,11 +469,12 @@ func (j *JSON) MustGetIntArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []int", keys)
+		e = errors.Newf("key %v is not of type []int", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asInt(keys, v); e != nil {
 			ret = []int{}
 			return
@@ -521,9 +487,7 @@ func (j *JSON) MustGetIntArray(
 
 // MustGetIntMap will return a map for the specified key(s) as a
 // map[string]int.
-func (j *JSON) MustGetIntMap(
-	keys ...interface{},
-) (ret map[string]int, e error) {
+func (j *JSON) MustGetIntMap(keys ...interface{}) (ret map[string]int, e error) {
 	var val interface{}
 
 	ret = map[string]int{}
@@ -538,6 +502,7 @@ func (j *JSON) MustGetIntMap(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asInt(keys, v); e != nil {
 			ret = map[string]int{}
 			return
@@ -547,37 +512,34 @@ func (j *JSON) MustGetIntMap(
 	return
 }
 
-func asInt8(
-	keys []interface{},
-	v interface{},
-) (ret int8, e error) {
-	switch v.(type) {
+func asInt8(keys []interface{}, v interface{}) (ret int8, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = int8(v.(float32))
+		ret = int8(v)
 	case float64:
-		ret = int8(v.(float64))
+		ret = int8(v)
 	case int:
-		ret = int8(v.(int))
+		ret = int8(v)
 	case int8:
-		ret = int8(v.(int8))
+		ret = int8(v)
 	case int16:
-		ret = int8(v.(int16))
+		ret = int8(v)
 	case int32:
-		ret = int8(v.(int32))
+		ret = int8(v)
 	case int64:
-		ret = int8(v.(int64))
+		ret = int8(v)
 	case uint:
-		ret = int8(v.(uint))
+		ret = int8(v)
 	case uint8:
-		ret = int8(v.(uint8))
+		ret = int8(v)
 	case uint16:
-		ret = int8(v.(uint16))
+		ret = int8(v)
 	case uint32:
-		ret = int8(v.(uint32))
+		ret = int8(v)
 	case uint64:
-		ret = int8(v.(uint64))
+		ret = int8(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a int8", keys)
+		e = errors.Newf("key %v is not of type int8", keys)
 	}
 	return
 }
@@ -598,33 +560,27 @@ func (j *JSON) GetInt8Array(keys ...interface{}) (ret []int8) {
 
 // GetInt8Map will return a map for the specified key(s) as a
 // map[string]int8.
-func (j *JSON) GetInt8Map(
-	keys ...interface{},
-) (ret map[string]int8) {
+func (j *JSON) GetInt8Map(keys ...interface{}) (ret map[string]int8) {
 	ret, _ = j.MustGetInt8Map(keys...)
 	return
 }
 
 // MustGetInt8 will return the value for the specified key(s) as a
 // int8.
-func (j *JSON) MustGetInt8(
-	keys ...interface{},
-) (ret int8, e error) {
+func (j *JSON) MustGetInt8(keys ...interface{}) (ret int8, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asInt8(keys, val)
+	ret, e = asInt8(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetInt8Array will return an array for the specified key(s)
 // as a []int8.
-func (j *JSON) MustGetInt8Array(
-	keys ...interface{},
-) (ret []int8, e error) {
+func (j *JSON) MustGetInt8Array(keys ...interface{}) (ret []int8, e error) {
 	var tmp int8
 	var val interface{}
 
@@ -638,11 +594,12 @@ func (j *JSON) MustGetInt8Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []int8", keys)
+		e = errors.Newf("key %v is not of type []int8", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asInt8(keys, v); e != nil {
 			ret = []int8{}
 			return
@@ -655,9 +612,7 @@ func (j *JSON) MustGetInt8Array(
 
 // MustGetInt8Map will return a map for the specified key(s) as a
 // map[string]int8.
-func (j *JSON) MustGetInt8Map(
-	keys ...interface{},
-) (ret map[string]int8, e error) {
+func (j *JSON) MustGetInt8Map(keys ...interface{}) (ret map[string]int8, e error) {
 	var val interface{}
 
 	ret = map[string]int8{}
@@ -672,6 +627,7 @@ func (j *JSON) MustGetInt8Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asInt8(keys, v); e != nil {
 			ret = map[string]int8{}
 			return
@@ -681,37 +637,34 @@ func (j *JSON) MustGetInt8Map(
 	return
 }
 
-func asInt16(
-	keys []interface{},
-	v interface{},
-) (ret int16, e error) {
-	switch v.(type) {
+func asInt16(keys []interface{}, v interface{}) (ret int16, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = int16(v.(float32))
+		ret = int16(v)
 	case float64:
-		ret = int16(v.(float64))
+		ret = int16(v)
 	case int:
-		ret = int16(v.(int))
+		ret = int16(v)
 	case int8:
-		ret = int16(v.(int8))
+		ret = int16(v)
 	case int16:
-		ret = int16(v.(int16))
+		ret = int16(v)
 	case int32:
-		ret = int16(v.(int32))
+		ret = int16(v)
 	case int64:
-		ret = int16(v.(int64))
+		ret = int16(v)
 	case uint:
-		ret = int16(v.(uint))
+		ret = int16(v)
 	case uint8:
-		ret = int16(v.(uint8))
+		ret = int16(v)
 	case uint16:
-		ret = int16(v.(uint16))
+		ret = int16(v)
 	case uint32:
-		ret = int16(v.(uint32))
+		ret = int16(v)
 	case uint64:
-		ret = int16(v.(uint64))
+		ret = int16(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a int16", keys)
+		e = errors.Newf("key %v is not of type int16", keys)
 	}
 	return
 }
@@ -732,33 +685,27 @@ func (j *JSON) GetInt16Array(keys ...interface{}) (ret []int16) {
 
 // GetInt16Map will return a map for the specified key(s) as a
 // map[string]int16.
-func (j *JSON) GetInt16Map(
-	keys ...interface{},
-) (ret map[string]int16) {
+func (j *JSON) GetInt16Map(keys ...interface{}) (ret map[string]int16) {
 	ret, _ = j.MustGetInt16Map(keys...)
 	return
 }
 
 // MustGetInt16 will return the value for the specified key(s) as a
 // int16.
-func (j *JSON) MustGetInt16(
-	keys ...interface{},
-) (ret int16, e error) {
+func (j *JSON) MustGetInt16(keys ...interface{}) (ret int16, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asInt16(keys, val)
+	ret, e = asInt16(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetInt16Array will return an array for the specified key(s)
 // as a []int16.
-func (j *JSON) MustGetInt16Array(
-	keys ...interface{},
-) (ret []int16, e error) {
+func (j *JSON) MustGetInt16Array(keys ...interface{}) (ret []int16, e error) {
 	var tmp int16
 	var val interface{}
 
@@ -772,11 +719,12 @@ func (j *JSON) MustGetInt16Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []int16", keys)
+		e = errors.Newf("key %v is not of type []int16", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asInt16(keys, v); e != nil {
 			ret = []int16{}
 			return
@@ -789,9 +737,7 @@ func (j *JSON) MustGetInt16Array(
 
 // MustGetInt16Map will return a map for the specified key(s) as a
 // map[string]int16.
-func (j *JSON) MustGetInt16Map(
-	keys ...interface{},
-) (ret map[string]int16, e error) {
+func (j *JSON) MustGetInt16Map(keys ...interface{}) (ret map[string]int16, e error) {
 	var val interface{}
 
 	ret = map[string]int16{}
@@ -806,6 +752,7 @@ func (j *JSON) MustGetInt16Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asInt16(keys, v); e != nil {
 			ret = map[string]int16{}
 			return
@@ -815,37 +762,34 @@ func (j *JSON) MustGetInt16Map(
 	return
 }
 
-func asInt32(
-	keys []interface{},
-	v interface{},
-) (ret int32, e error) {
-	switch v.(type) {
+func asInt32(keys []interface{}, v interface{}) (ret int32, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = int32(v.(float32))
+		ret = int32(v)
 	case float64:
-		ret = int32(v.(float64))
+		ret = int32(v)
 	case int:
-		ret = int32(v.(int))
+		ret = int32(v)
 	case int8:
-		ret = int32(v.(int8))
+		ret = int32(v)
 	case int16:
-		ret = int32(v.(int16))
+		ret = int32(v)
 	case int32:
-		ret = int32(v.(int32))
+		ret = int32(v)
 	case int64:
-		ret = int32(v.(int64))
+		ret = int32(v)
 	case uint:
-		ret = int32(v.(uint))
+		ret = int32(v)
 	case uint8:
-		ret = int32(v.(uint8))
+		ret = int32(v)
 	case uint16:
-		ret = int32(v.(uint16))
+		ret = int32(v)
 	case uint32:
-		ret = int32(v.(uint32))
+		ret = int32(v)
 	case uint64:
-		ret = int32(v.(uint64))
+		ret = int32(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a int32", keys)
+		e = errors.Newf("key %v is not of type int32", keys)
 	}
 	return
 }
@@ -866,33 +810,27 @@ func (j *JSON) GetInt32Array(keys ...interface{}) (ret []int32) {
 
 // GetInt32Map will return a map for the specified key(s) as a
 // map[string]int32.
-func (j *JSON) GetInt32Map(
-	keys ...interface{},
-) (ret map[string]int32) {
+func (j *JSON) GetInt32Map(keys ...interface{}) (ret map[string]int32) {
 	ret, _ = j.MustGetInt32Map(keys...)
 	return
 }
 
 // MustGetInt32 will return the value for the specified key(s) as a
 // int32.
-func (j *JSON) MustGetInt32(
-	keys ...interface{},
-) (ret int32, e error) {
+func (j *JSON) MustGetInt32(keys ...interface{}) (ret int32, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asInt32(keys, val)
+	ret, e = asInt32(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetInt32Array will return an array for the specified key(s)
 // as a []int32.
-func (j *JSON) MustGetInt32Array(
-	keys ...interface{},
-) (ret []int32, e error) {
+func (j *JSON) MustGetInt32Array(keys ...interface{}) (ret []int32, e error) {
 	var tmp int32
 	var val interface{}
 
@@ -906,11 +844,12 @@ func (j *JSON) MustGetInt32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []int32", keys)
+		e = errors.Newf("key %v is not of type []int32", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asInt32(keys, v); e != nil {
 			ret = []int32{}
 			return
@@ -923,9 +862,7 @@ func (j *JSON) MustGetInt32Array(
 
 // MustGetInt32Map will return a map for the specified key(s) as a
 // map[string]int32.
-func (j *JSON) MustGetInt32Map(
-	keys ...interface{},
-) (ret map[string]int32, e error) {
+func (j *JSON) MustGetInt32Map(keys ...interface{}) (ret map[string]int32, e error) {
 	var val interface{}
 
 	ret = map[string]int32{}
@@ -940,6 +877,7 @@ func (j *JSON) MustGetInt32Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asInt32(keys, v); e != nil {
 			ret = map[string]int32{}
 			return
@@ -949,37 +887,34 @@ func (j *JSON) MustGetInt32Map(
 	return
 }
 
-func asInt64(
-	keys []interface{},
-	v interface{},
-) (ret int64, e error) {
-	switch v.(type) {
+func asInt64(keys []interface{}, v interface{}) (ret int64, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = int64(v.(float32))
+		ret = int64(v)
 	case float64:
-		ret = int64(v.(float64))
+		ret = int64(v)
 	case int:
-		ret = int64(v.(int))
+		ret = int64(v)
 	case int8:
-		ret = int64(v.(int8))
+		ret = int64(v)
 	case int16:
-		ret = int64(v.(int16))
+		ret = int64(v)
 	case int32:
-		ret = int64(v.(int32))
+		ret = int64(v)
 	case int64:
-		ret = int64(v.(int64))
+		ret = int64(v)
 	case uint:
-		ret = int64(v.(uint))
+		ret = int64(v)
 	case uint8:
-		ret = int64(v.(uint8))
+		ret = int64(v)
 	case uint16:
-		ret = int64(v.(uint16))
+		ret = int64(v)
 	case uint32:
-		ret = int64(v.(uint32))
+		ret = int64(v)
 	case uint64:
-		ret = int64(v.(uint64))
+		ret = int64(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a int64", keys)
+		e = errors.Newf("key %v is not of type int64", keys)
 	}
 	return
 }
@@ -1000,33 +935,27 @@ func (j *JSON) GetInt64Array(keys ...interface{}) (ret []int64) {
 
 // GetInt64Map will return a map for the specified key(s) as a
 // map[string]int64.
-func (j *JSON) GetInt64Map(
-	keys ...interface{},
-) (ret map[string]int64) {
+func (j *JSON) GetInt64Map(keys ...interface{}) (ret map[string]int64) {
 	ret, _ = j.MustGetInt64Map(keys...)
 	return
 }
 
 // MustGetInt64 will return the value for the specified key(s) as a
 // int64.
-func (j *JSON) MustGetInt64(
-	keys ...interface{},
-) (ret int64, e error) {
+func (j *JSON) MustGetInt64(keys ...interface{}) (ret int64, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asInt64(keys, val)
+	ret, e = asInt64(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetInt64Array will return an array for the specified key(s)
 // as a []int64.
-func (j *JSON) MustGetInt64Array(
-	keys ...interface{},
-) (ret []int64, e error) {
+func (j *JSON) MustGetInt64Array(keys ...interface{}) (ret []int64, e error) {
 	var tmp int64
 	var val interface{}
 
@@ -1040,11 +969,12 @@ func (j *JSON) MustGetInt64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []int64", keys)
+		e = errors.Newf("key %v is not of type []int64", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asInt64(keys, v); e != nil {
 			ret = []int64{}
 			return
@@ -1057,9 +987,7 @@ func (j *JSON) MustGetInt64Array(
 
 // MustGetInt64Map will return a map for the specified key(s) as a
 // map[string]int64.
-func (j *JSON) MustGetInt64Map(
-	keys ...interface{},
-) (ret map[string]int64, e error) {
+func (j *JSON) MustGetInt64Map(keys ...interface{}) (ret map[string]int64, e error) {
 	var val interface{}
 
 	ret = map[string]int64{}
@@ -1074,6 +1002,7 @@ func (j *JSON) MustGetInt64Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asInt64(keys, v); e != nil {
 			ret = map[string]int64{}
 			return
@@ -1083,15 +1012,12 @@ func (j *JSON) MustGetInt64Map(
 	return
 }
 
-func asString(
-	keys []interface{},
-	v interface{},
-) (ret string, e error) {
-	switch v.(type) {
+func asString(keys []interface{}, v interface{}) (ret string, e error) {
+	switch v := v.(type) {
 	case string:
-		ret = v.(string)
+		ret = v
 	default:
-		e = fmt.Errorf("jq: key %v is not a string", keys)
+		e = errors.Newf("key %v is not of type string", keys)
 	}
 	return
 }
@@ -1112,33 +1038,27 @@ func (j *JSON) GetStringArray(keys ...interface{}) (ret []string) {
 
 // GetStringMap will return a map for the specified key(s) as a
 // map[string]string.
-func (j *JSON) GetStringMap(
-	keys ...interface{},
-) (ret map[string]string) {
+func (j *JSON) GetStringMap(keys ...interface{}) (ret map[string]string) {
 	ret, _ = j.MustGetStringMap(keys...)
 	return
 }
 
 // MustGetString will return the value for the specified key(s) as a
 // string.
-func (j *JSON) MustGetString(
-	keys ...interface{},
-) (ret string, e error) {
+func (j *JSON) MustGetString(keys ...interface{}) (ret string, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asString(keys, val)
+	ret, e = asString(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetStringArray will return an array for the specified key(s)
 // as a []string.
-func (j *JSON) MustGetStringArray(
-	keys ...interface{},
-) (ret []string, e error) {
+func (j *JSON) MustGetStringArray(keys ...interface{}) (ret []string, e error) {
 	var tmp string
 	var val interface{}
 
@@ -1152,11 +1072,12 @@ func (j *JSON) MustGetStringArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []string", keys)
+		e = errors.Newf("key %v is not of type []string", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asString(keys, v); e != nil {
 			ret = []string{}
 			return
@@ -1169,9 +1090,7 @@ func (j *JSON) MustGetStringArray(
 
 // MustGetStringMap will return a map for the specified key(s) as a
 // map[string]string.
-func (j *JSON) MustGetStringMap(
-	keys ...interface{},
-) (ret map[string]string, e error) {
+func (j *JSON) MustGetStringMap(keys ...interface{}) (ret map[string]string, e error) {
 	var val interface{}
 
 	ret = map[string]string{}
@@ -1186,6 +1105,7 @@ func (j *JSON) MustGetStringMap(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asString(keys, v); e != nil {
 			ret = map[string]string{}
 			return
@@ -1195,37 +1115,34 @@ func (j *JSON) MustGetStringMap(
 	return
 }
 
-func asUint(
-	keys []interface{},
-	v interface{},
-) (ret uint, e error) {
-	switch v.(type) {
+func asUint(keys []interface{}, v interface{}) (ret uint, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = uint(v.(float32))
+		ret = uint(v)
 	case float64:
-		ret = uint(v.(float64))
+		ret = uint(v)
 	case int:
-		ret = uint(v.(int))
+		ret = uint(v)
 	case int8:
-		ret = uint(v.(int8))
+		ret = uint(v)
 	case int16:
-		ret = uint(v.(int16))
+		ret = uint(v)
 	case int32:
-		ret = uint(v.(int32))
+		ret = uint(v)
 	case int64:
-		ret = uint(v.(int64))
+		ret = uint(v)
 	case uint:
-		ret = uint(v.(uint))
+		ret = uint(v)
 	case uint8:
-		ret = uint(v.(uint8))
+		ret = uint(v)
 	case uint16:
-		ret = uint(v.(uint16))
+		ret = uint(v)
 	case uint32:
-		ret = uint(v.(uint32))
+		ret = uint(v)
 	case uint64:
-		ret = uint(v.(uint64))
+		ret = uint(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a uint", keys)
+		e = errors.Newf("key %v is not of type uint", keys)
 	}
 	return
 }
@@ -1246,33 +1163,27 @@ func (j *JSON) GetUintArray(keys ...interface{}) (ret []uint) {
 
 // GetUintMap will return a map for the specified key(s) as a
 // map[string]uint.
-func (j *JSON) GetUintMap(
-	keys ...interface{},
-) (ret map[string]uint) {
+func (j *JSON) GetUintMap(keys ...interface{}) (ret map[string]uint) {
 	ret, _ = j.MustGetUintMap(keys...)
 	return
 }
 
 // MustGetUint will return the value for the specified key(s) as a
 // uint.
-func (j *JSON) MustGetUint(
-	keys ...interface{},
-) (ret uint, e error) {
+func (j *JSON) MustGetUint(keys ...interface{}) (ret uint, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asUint(keys, val)
+	ret, e = asUint(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetUintArray will return an array for the specified key(s)
 // as a []uint.
-func (j *JSON) MustGetUintArray(
-	keys ...interface{},
-) (ret []uint, e error) {
+func (j *JSON) MustGetUintArray(keys ...interface{}) (ret []uint, e error) {
 	var tmp uint
 	var val interface{}
 
@@ -1286,11 +1197,12 @@ func (j *JSON) MustGetUintArray(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []uint", keys)
+		e = errors.Newf("key %v is not of type []uint", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asUint(keys, v); e != nil {
 			ret = []uint{}
 			return
@@ -1303,9 +1215,7 @@ func (j *JSON) MustGetUintArray(
 
 // MustGetUintMap will return a map for the specified key(s) as a
 // map[string]uint.
-func (j *JSON) MustGetUintMap(
-	keys ...interface{},
-) (ret map[string]uint, e error) {
+func (j *JSON) MustGetUintMap(keys ...interface{}) (ret map[string]uint, e error) {
 	var val interface{}
 
 	ret = map[string]uint{}
@@ -1320,6 +1230,7 @@ func (j *JSON) MustGetUintMap(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asUint(keys, v); e != nil {
 			ret = map[string]uint{}
 			return
@@ -1329,37 +1240,34 @@ func (j *JSON) MustGetUintMap(
 	return
 }
 
-func asUint8(
-	keys []interface{},
-	v interface{},
-) (ret uint8, e error) {
-	switch v.(type) {
+func asUint8(keys []interface{}, v interface{}) (ret uint8, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = uint8(v.(float32))
+		ret = uint8(v)
 	case float64:
-		ret = uint8(v.(float64))
+		ret = uint8(v)
 	case int:
-		ret = uint8(v.(int))
+		ret = uint8(v)
 	case int8:
-		ret = uint8(v.(int8))
+		ret = uint8(v)
 	case int16:
-		ret = uint8(v.(int16))
+		ret = uint8(v)
 	case int32:
-		ret = uint8(v.(int32))
+		ret = uint8(v)
 	case int64:
-		ret = uint8(v.(int64))
+		ret = uint8(v)
 	case uint:
-		ret = uint8(v.(uint))
+		ret = uint8(v)
 	case uint8:
-		ret = uint8(v.(uint8))
+		ret = uint8(v)
 	case uint16:
-		ret = uint8(v.(uint16))
+		ret = uint8(v)
 	case uint32:
-		ret = uint8(v.(uint32))
+		ret = uint8(v)
 	case uint64:
-		ret = uint8(v.(uint64))
+		ret = uint8(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a uint8", keys)
+		e = errors.Newf("key %v is not of type uint8", keys)
 	}
 	return
 }
@@ -1380,33 +1288,27 @@ func (j *JSON) GetUint8Array(keys ...interface{}) (ret []uint8) {
 
 // GetUint8Map will return a map for the specified key(s) as a
 // map[string]uint8.
-func (j *JSON) GetUint8Map(
-	keys ...interface{},
-) (ret map[string]uint8) {
+func (j *JSON) GetUint8Map(keys ...interface{}) (ret map[string]uint8) {
 	ret, _ = j.MustGetUint8Map(keys...)
 	return
 }
 
 // MustGetUint8 will return the value for the specified key(s) as a
 // uint8.
-func (j *JSON) MustGetUint8(
-	keys ...interface{},
-) (ret uint8, e error) {
+func (j *JSON) MustGetUint8(keys ...interface{}) (ret uint8, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asUint8(keys, val)
+	ret, e = asUint8(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetUint8Array will return an array for the specified key(s)
 // as a []uint8.
-func (j *JSON) MustGetUint8Array(
-	keys ...interface{},
-) (ret []uint8, e error) {
+func (j *JSON) MustGetUint8Array(keys ...interface{}) (ret []uint8, e error) {
 	var tmp uint8
 	var val interface{}
 
@@ -1420,11 +1322,12 @@ func (j *JSON) MustGetUint8Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []uint8", keys)
+		e = errors.Newf("key %v is not of type []uint8", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asUint8(keys, v); e != nil {
 			ret = []uint8{}
 			return
@@ -1437,9 +1340,7 @@ func (j *JSON) MustGetUint8Array(
 
 // MustGetUint8Map will return a map for the specified key(s) as a
 // map[string]uint8.
-func (j *JSON) MustGetUint8Map(
-	keys ...interface{},
-) (ret map[string]uint8, e error) {
+func (j *JSON) MustGetUint8Map(keys ...interface{}) (ret map[string]uint8, e error) {
 	var val interface{}
 
 	ret = map[string]uint8{}
@@ -1454,6 +1355,7 @@ func (j *JSON) MustGetUint8Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asUint8(keys, v); e != nil {
 			ret = map[string]uint8{}
 			return
@@ -1463,37 +1365,34 @@ func (j *JSON) MustGetUint8Map(
 	return
 }
 
-func asUint16(
-	keys []interface{},
-	v interface{},
-) (ret uint16, e error) {
-	switch v.(type) {
+func asUint16(keys []interface{}, v interface{}) (ret uint16, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = uint16(v.(float32))
+		ret = uint16(v)
 	case float64:
-		ret = uint16(v.(float64))
+		ret = uint16(v)
 	case int:
-		ret = uint16(v.(int))
+		ret = uint16(v)
 	case int8:
-		ret = uint16(v.(int8))
+		ret = uint16(v)
 	case int16:
-		ret = uint16(v.(int16))
+		ret = uint16(v)
 	case int32:
-		ret = uint16(v.(int32))
+		ret = uint16(v)
 	case int64:
-		ret = uint16(v.(int64))
+		ret = uint16(v)
 	case uint:
-		ret = uint16(v.(uint))
+		ret = uint16(v)
 	case uint8:
-		ret = uint16(v.(uint8))
+		ret = uint16(v)
 	case uint16:
-		ret = uint16(v.(uint16))
+		ret = uint16(v)
 	case uint32:
-		ret = uint16(v.(uint32))
+		ret = uint16(v)
 	case uint64:
-		ret = uint16(v.(uint64))
+		ret = uint16(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a uint16", keys)
+		e = errors.Newf("key %v is not of type uint16", keys)
 	}
 	return
 }
@@ -1514,33 +1413,27 @@ func (j *JSON) GetUint16Array(keys ...interface{}) (ret []uint16) {
 
 // GetUint16Map will return a map for the specified key(s) as a
 // map[string]uint16.
-func (j *JSON) GetUint16Map(
-	keys ...interface{},
-) (ret map[string]uint16) {
+func (j *JSON) GetUint16Map(keys ...interface{}) (ret map[string]uint16) {
 	ret, _ = j.MustGetUint16Map(keys...)
 	return
 }
 
 // MustGetUint16 will return the value for the specified key(s) as a
 // uint16.
-func (j *JSON) MustGetUint16(
-	keys ...interface{},
-) (ret uint16, e error) {
+func (j *JSON) MustGetUint16(keys ...interface{}) (ret uint16, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asUint16(keys, val)
+	ret, e = asUint16(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetUint16Array will return an array for the specified key(s)
 // as a []uint16.
-func (j *JSON) MustGetUint16Array(
-	keys ...interface{},
-) (ret []uint16, e error) {
+func (j *JSON) MustGetUint16Array(keys ...interface{}) (ret []uint16, e error) {
 	var tmp uint16
 	var val interface{}
 
@@ -1554,11 +1447,12 @@ func (j *JSON) MustGetUint16Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []uint16", keys)
+		e = errors.Newf("key %v is not of type []uint16", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asUint16(keys, v); e != nil {
 			ret = []uint16{}
 			return
@@ -1571,9 +1465,7 @@ func (j *JSON) MustGetUint16Array(
 
 // MustGetUint16Map will return a map for the specified key(s) as a
 // map[string]uint16.
-func (j *JSON) MustGetUint16Map(
-	keys ...interface{},
-) (ret map[string]uint16, e error) {
+func (j *JSON) MustGetUint16Map(keys ...interface{}) (ret map[string]uint16, e error) {
 	var val interface{}
 
 	ret = map[string]uint16{}
@@ -1588,6 +1480,7 @@ func (j *JSON) MustGetUint16Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asUint16(keys, v); e != nil {
 			ret = map[string]uint16{}
 			return
@@ -1597,37 +1490,34 @@ func (j *JSON) MustGetUint16Map(
 	return
 }
 
-func asUint32(
-	keys []interface{},
-	v interface{},
-) (ret uint32, e error) {
-	switch v.(type) {
+func asUint32(keys []interface{}, v interface{}) (ret uint32, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = uint32(v.(float32))
+		ret = uint32(v)
 	case float64:
-		ret = uint32(v.(float64))
+		ret = uint32(v)
 	case int:
-		ret = uint32(v.(int))
+		ret = uint32(v)
 	case int8:
-		ret = uint32(v.(int8))
+		ret = uint32(v)
 	case int16:
-		ret = uint32(v.(int16))
+		ret = uint32(v)
 	case int32:
-		ret = uint32(v.(int32))
+		ret = uint32(v)
 	case int64:
-		ret = uint32(v.(int64))
+		ret = uint32(v)
 	case uint:
-		ret = uint32(v.(uint))
+		ret = uint32(v)
 	case uint8:
-		ret = uint32(v.(uint8))
+		ret = uint32(v)
 	case uint16:
-		ret = uint32(v.(uint16))
+		ret = uint32(v)
 	case uint32:
-		ret = uint32(v.(uint32))
+		ret = uint32(v)
 	case uint64:
-		ret = uint32(v.(uint64))
+		ret = uint32(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a uint32", keys)
+		e = errors.Newf("key %v is not of type uint32", keys)
 	}
 	return
 }
@@ -1648,33 +1538,27 @@ func (j *JSON) GetUint32Array(keys ...interface{}) (ret []uint32) {
 
 // GetUint32Map will return a map for the specified key(s) as a
 // map[string]uint32.
-func (j *JSON) GetUint32Map(
-	keys ...interface{},
-) (ret map[string]uint32) {
+func (j *JSON) GetUint32Map(keys ...interface{}) (ret map[string]uint32) {
 	ret, _ = j.MustGetUint32Map(keys...)
 	return
 }
 
 // MustGetUint32 will return the value for the specified key(s) as a
 // uint32.
-func (j *JSON) MustGetUint32(
-	keys ...interface{},
-) (ret uint32, e error) {
+func (j *JSON) MustGetUint32(keys ...interface{}) (ret uint32, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asUint32(keys, val)
+	ret, e = asUint32(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetUint32Array will return an array for the specified key(s)
 // as a []uint32.
-func (j *JSON) MustGetUint32Array(
-	keys ...interface{},
-) (ret []uint32, e error) {
+func (j *JSON) MustGetUint32Array(keys ...interface{}) (ret []uint32, e error) {
 	var tmp uint32
 	var val interface{}
 
@@ -1688,11 +1572,12 @@ func (j *JSON) MustGetUint32Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []uint32", keys)
+		e = errors.Newf("key %v is not of type []uint32", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asUint32(keys, v); e != nil {
 			ret = []uint32{}
 			return
@@ -1705,9 +1590,7 @@ func (j *JSON) MustGetUint32Array(
 
 // MustGetUint32Map will return a map for the specified key(s) as a
 // map[string]uint32.
-func (j *JSON) MustGetUint32Map(
-	keys ...interface{},
-) (ret map[string]uint32, e error) {
+func (j *JSON) MustGetUint32Map(keys ...interface{}) (ret map[string]uint32, e error) {
 	var val interface{}
 
 	ret = map[string]uint32{}
@@ -1722,6 +1605,7 @@ func (j *JSON) MustGetUint32Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asUint32(keys, v); e != nil {
 			ret = map[string]uint32{}
 			return
@@ -1731,37 +1615,34 @@ func (j *JSON) MustGetUint32Map(
 	return
 }
 
-func asUint64(
-	keys []interface{},
-	v interface{},
-) (ret uint64, e error) {
-	switch v.(type) {
+func asUint64(keys []interface{}, v interface{}) (ret uint64, e error) {
+	switch v := v.(type) {
 	case float32:
-		ret = uint64(v.(float32))
+		ret = uint64(v)
 	case float64:
-		ret = uint64(v.(float64))
+		ret = uint64(v)
 	case int:
-		ret = uint64(v.(int))
+		ret = uint64(v)
 	case int8:
-		ret = uint64(v.(int8))
+		ret = uint64(v)
 	case int16:
-		ret = uint64(v.(int16))
+		ret = uint64(v)
 	case int32:
-		ret = uint64(v.(int32))
+		ret = uint64(v)
 	case int64:
-		ret = uint64(v.(int64))
+		ret = uint64(v)
 	case uint:
-		ret = uint64(v.(uint))
+		ret = uint64(v)
 	case uint8:
-		ret = uint64(v.(uint8))
+		ret = uint64(v)
 	case uint16:
-		ret = uint64(v.(uint16))
+		ret = uint64(v)
 	case uint32:
-		ret = uint64(v.(uint32))
+		ret = uint64(v)
 	case uint64:
-		ret = uint64(v.(uint64))
+		ret = uint64(v)
 	default:
-		e = fmt.Errorf("jq: key %v is not a uint64", keys)
+		e = errors.Newf("key %v is not of type uint64", keys)
 	}
 	return
 }
@@ -1782,33 +1663,27 @@ func (j *JSON) GetUint64Array(keys ...interface{}) (ret []uint64) {
 
 // GetUint64Map will return a map for the specified key(s) as a
 // map[string]uint64.
-func (j *JSON) GetUint64Map(
-	keys ...interface{},
-) (ret map[string]uint64) {
+func (j *JSON) GetUint64Map(keys ...interface{}) (ret map[string]uint64) {
 	ret, _ = j.MustGetUint64Map(keys...)
 	return
 }
 
 // MustGetUint64 will return the value for the specified key(s) as a
 // uint64.
-func (j *JSON) MustGetUint64(
-	keys ...interface{},
-) (ret uint64, e error) {
+func (j *JSON) MustGetUint64(keys ...interface{}) (ret uint64, e error) {
 	var val interface{}
 
 	if val, e = j.nestedGetKey(keys); e != nil {
 		return
 	}
 
-	ret, e = asUint64(keys, val)
+	ret, e = asUint64(keys, val) // No need to wrap e
 	return
 }
 
 // MustGetUint64Array will return an array for the specified key(s)
 // as a []uint64.
-func (j *JSON) MustGetUint64Array(
-	keys ...interface{},
-) (ret []uint64, e error) {
+func (j *JSON) MustGetUint64Array(keys ...interface{}) (ret []uint64, e error) {
 	var tmp uint64
 	var val interface{}
 
@@ -1822,11 +1697,12 @@ func (j *JSON) MustGetUint64Array(
 	}
 
 	if _, ok := val.([]interface{}); !ok {
-		e = fmt.Errorf("jq: key %v is not a []uint64", keys)
+		e = errors.Newf("key %v is not of type []uint64", keys)
 		return
 	}
 
 	for _, v := range val.([]interface{}) {
+		// No need to wrap e
 		if tmp, e = asUint64(keys, v); e != nil {
 			ret = []uint64{}
 			return
@@ -1839,9 +1715,7 @@ func (j *JSON) MustGetUint64Array(
 
 // MustGetUint64Map will return a map for the specified key(s) as a
 // map[string]uint64.
-func (j *JSON) MustGetUint64Map(
-	keys ...interface{},
-) (ret map[string]uint64, e error) {
+func (j *JSON) MustGetUint64Map(keys ...interface{}) (ret map[string]uint64, e error) {
 	var val interface{}
 
 	ret = map[string]uint64{}
@@ -1856,6 +1730,7 @@ func (j *JSON) MustGetUint64Map(
 	}
 
 	for k, v := range val.(map[string]interface{}) {
+		// No need to wrap e
 		if ret[k], e = asUint64(keys, v); e != nil {
 			ret = map[string]uint64{}
 			return

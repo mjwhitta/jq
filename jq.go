@@ -2,8 +2,9 @@ package jq
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
+
+	"gitlab.com/mjwhitta/errors"
 )
 
 // JSON is a struct that holds a JSON blob.
@@ -30,7 +31,11 @@ func (j *JSON) Append(value interface{}, keys ...interface{}) error {
 		return e
 	}
 
-	return j.Set(append(parent, value), keys...)
+	if e = j.Set(append(parent, value), keys...); e != nil {
+		return e
+	}
+
+	return nil
 }
 
 // Clear will reset the JSON blob to {}.
@@ -57,6 +62,7 @@ func (j *JSON) GetBlob(params ...string) (ret string, e error) {
 	enc.SetIndent(pre, indent)
 
 	if e = enc.Encode(j.blob); e != nil {
+		e = errors.Newf("failed to encode JSON: %w", e)
 		return
 	}
 
@@ -69,7 +75,6 @@ func (j *JSON) GetBlob(params ...string) (ret string, e error) {
 // returns an array or map.
 func (j *JSON) GetKeys(keys ...interface{}) (ret []string) {
 	ret, _ = j.MustGetKeys(keys...)
-
 	return
 }
 
@@ -79,7 +84,6 @@ func (j *JSON) HasKey(keys ...interface{}) bool {
 	var e error
 
 	_, e = j.nestedGetKey(keys)
-
 	return e == nil
 }
 
@@ -106,7 +110,7 @@ func (j *JSON) MustGetArray(
 	case []interface{}:
 		ret = val
 	default:
-		e = fmt.Errorf("jq: key %v is not a []interface{}", keys)
+		e = errors.Newf("key %v is not of type []interface{}", keys)
 	}
 
 	return
@@ -143,7 +147,7 @@ func (j *JSON) MustGetKeys(
 	case []uint, []uint8, []uint16, []uint32, []uint64:
 		ret = mustGetUintArrayKeys(val)
 	default:
-		e = fmt.Errorf("jq: key %v has no valid sub-keys", keys)
+		e = errors.Newf("key %v has no valid sub-keys", keys)
 	}
 
 	return
@@ -174,8 +178,8 @@ func (j *JSON) MustGetMap(
 	case map[string]interface{}:
 		ret = val
 	default:
-		e = fmt.Errorf(
-			"jq: key %v is not a map[string]interface{}",
+		e = errors.Newf(
+			"key %v is not of type map[string]interface{}",
 			keys,
 		)
 	}
@@ -198,7 +202,7 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 		}
 
 		if (e != nil) || (v == nil) {
-			return nil, fmt.Errorf("jq: key %v not found", keys)
+			return nil, errors.Newf("key %v not found", keys)
 		}
 
 		val = v
@@ -231,8 +235,8 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		case map[string]interface{}:
 			j.blob = value
 		default:
-			e = fmt.Errorf(
-				"jq: value is not a map[string]interface{}",
+			e = errors.Newf(
+				"value is not of type map[string]interface{}",
 			)
 		}
 
@@ -271,7 +275,7 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 		return j.Set(parentArr, keys[0:len(keys)-1]...)
 	}
 
-	return fmt.Errorf("jq: key %v not found", keys)
+	return errors.Newf("key %v not found", keys)
 }
 
 // SetBlob will replace the underlying map[string]interface{} with a
@@ -287,7 +291,9 @@ func (j *JSON) SetBlob(blob ...string) (e error) {
 	j.blob = map[string]interface{}{}
 
 	dec = json.NewDecoder(strings.NewReader(blobStr))
-	e = dec.Decode(&j.blob)
+	if e = dec.Decode(&j.blob); e != nil {
+		e = errors.Newf("failed to decode JSON: %w", e)
+	}
 
 	return
 }
