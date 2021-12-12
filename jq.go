@@ -201,7 +201,11 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 			v = val.([]interface{})[tryInt]
 		}
 
-		if (e != nil) || (v == nil) {
+		if e != nil {
+			return nil, e
+		}
+
+		if v == nil {
 			return nil, errors.Newf("key %v not found", keys)
 		}
 
