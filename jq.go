@@ -215,6 +215,41 @@ func (j *JSON) nestedGetKey(keys []interface{}) (interface{}, error) {
 	return val, nil
 }
 
+func (j *JSON) replace(value interface{}) error {
+	// Replacing whole JSON map
+	switch value := value.(type) {
+	case map[string]bool, map[string]string:
+		j.blob = mustGetMapAsInterface(value)
+	case map[string]float32, map[string]float64:
+		j.blob = mustGetFloatMapAsInterface(value)
+	case map[string]int, map[string]int8, map[string]int16,
+		map[string]int32, map[string]int64:
+		j.blob = mustGetIntMapAsInterface(value)
+	case map[string]uint, map[string]uint8, map[string]uint16,
+		map[string]uint32, map[string]uint64:
+		j.blob = mustGetUintMapAsInterface(value)
+	case map[string]interface{}:
+		j.blob = value
+	default:
+		return errors.Newf(
+			"value is not of type map[string]interface{}",
+		)
+	}
+
+	return j.reset()
+}
+
+func (j *JSON) reset() error {
+	var e error
+	var tmp string
+
+	if tmp, e = j.GetBlob(); e != nil {
+		return e
+	}
+
+	return j.SetBlob(tmp)
+}
+
 // Set will set the specified value for the specified key in the JSON
 // blob.
 func (j *JSON) Set(value interface{}, keys ...interface{}) error {
@@ -225,33 +260,16 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 	var tryString string
 
 	if len(keys) == 0 {
-		switch value := value.(type) {
-		case map[string]bool, map[string]string:
-			j.blob = mustGetMapAsInterface(value)
-		case map[string]float32, map[string]float64:
-			j.blob = mustGetFloatMapAsInterface(value)
-		case map[string]int, map[string]int8, map[string]int16,
-			map[string]int32, map[string]int64:
-			j.blob = mustGetIntMapAsInterface(value)
-		case map[string]uint, map[string]uint8, map[string]uint16,
-			map[string]uint32, map[string]uint64:
-			j.blob = mustGetUintMapAsInterface(value)
-		case map[string]interface{}:
-			j.blob = value
-		default:
-			e = errors.Newf(
-				"value is not of type map[string]interface{}",
-			)
-		}
-
-		return e
+		return j.replace(value)
 	} else if len(keys) == 1 {
+		// Replacing top-level key in JSON map
 		if tryString, e = asString(keys, keys[0]); e != nil {
 			return e
 		}
 
 		j.blob[tryString] = value
-		return nil
+
+		return j.reset()
 	}
 
 	if _, e = j.nestedGetKey(keys[0 : len(keys)-1]); e != nil {
@@ -260,23 +278,33 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 
 	parentMap, e = j.MustGetMap(keys[0 : len(keys)-1]...)
 	if e == nil {
+		// Replacing key in JSON map
 		tryString, e = asString(keys, keys[len(keys)-1])
 		if e != nil {
 			return e
 		}
 
 		parentMap[tryString] = value
-		return j.Set(parentMap, keys[0:len(keys)-1]...)
+		if e = j.Set(parentMap, keys[0:len(keys)-1]...); e != nil {
+			return e
+		}
+
+		return j.reset()
 	}
 
 	parentArr, e = j.MustGetArray(keys[0 : len(keys)-1]...)
 	if e == nil {
+		// Replacing array in JSON map
 		if tryInt, e = asInt(keys, keys[len(keys)-1]); e != nil {
 			return e
 		}
 
 		parentArr[tryInt] = value
-		return j.Set(parentArr, keys[0:len(keys)-1]...)
+		if e = j.Set(parentArr, keys[0:len(keys)-1]...); e != nil {
+			return e
+		}
+
+		return j.reset()
 	}
 
 	return errors.Newf("key %v not found", keys)
@@ -284,9 +312,10 @@ func (j *JSON) Set(value interface{}, keys ...interface{}) error {
 
 // SetBlob will replace the underlying map[string]interface{} with a
 // new JSON blob.
-func (j *JSON) SetBlob(blob ...string) (e error) {
+func (j *JSON) SetBlob(blob ...string) error {
 	var blobStr = strings.TrimSpace(strings.Join(blob, ""))
 	var dec *json.Decoder
+	var e error
 
 	if blobStr == "" {
 		blobStr = "{}"
@@ -296,10 +325,10 @@ func (j *JSON) SetBlob(blob ...string) (e error) {
 
 	dec = json.NewDecoder(strings.NewReader(blobStr))
 	if e = dec.Decode(&j.blob); e != nil {
-		e = errors.Newf("failed to decode JSON: %w", e)
+		return errors.Newf("failed to decode JSON: %w", e)
 	}
 
-	return
+	return nil
 }
 
 // SetEscapeHTML will set whether or not Marshalling should escape

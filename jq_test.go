@@ -12,7 +12,7 @@ var def = map[string]interface{}{
 	"a": true,
 	"b": "asdf",
 	"c": 1234,
-	"d": []string{"blah", "test"},
+	"d": [2]string{"blah", "test"},
 	"e": map[string]interface{}{
 		"aFloat": 1.2,
 		"anInt":  17,
