@@ -1,2 +1,2 @@
-gitlab.com/mjwhitta/errors v1.0.0 h1:rivvgv4HCdIJ6Y6kFfPcirzKnBRewkjgsOktR0Uaj8g=
-gitlab.com/mjwhitta/errors v1.0.0/go.mod h1:5mFayhs7rnrBmc6kd3d1l1YaAY4is/IjYNVmCtJc0lU=
+github.com/mjwhitta/errors v1.0.1 h1:f12gpCh23cfzXUgtlZBWGs387ZJeEeOemv7hLSvBAx0=
+github.com/mjwhitta/errors v1.0.1/go.mod h1:VxHM8bLMPVqkvHiYQq4Nq4sjNqPjUtKLhSF2I0wve5U=

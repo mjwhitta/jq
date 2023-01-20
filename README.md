@@ -2,7 +2,7 @@
 
 <a href="https://www.buymeacoffee.com/mjwhitta">🍪 Buy me a cookie</a>
 
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/mjwhitta/jq)](https://goreportcard.com/report/gitlab.com/mjwhitta/jq)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mjwhitta/jq)](https://goreportcard.com/report/github.com/mjwhitta/jq)
 
 ## What is this?
 
@@ -13,7 +13,7 @@ This Go module allows you to parse JSON blobs in a "sane" manner.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags="-s -w" --trimpath -u gitlab.com/mjwhitta/jq
+$ go get --ldflags="-s -w" --trimpath -u github.com/mjwhitta/jq
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ import (
     "os"
     "strings"
 
-    "gitlab.com/mjwhitta/jq"
+    "github.com/mjwhitta/jq"
 )
 
 func main() {
@@ -146,4 +146,4 @@ func main() {
 
 ## Links
 
-- [Source](https://gitlab.com/mjwhitta/jq)
+- [Source](https://github.com/mjwhitta/jq)

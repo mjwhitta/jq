@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"gitlab.com/mjwhitta/jq"
+	"github.com/mjwhitta/jq"
 )
 
 var def = map[string]interface{}{

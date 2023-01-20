@@ -1,5 +1,5 @@
-module gitlab.com/mjwhitta/jq
+module github.com/mjwhitta/jq
 
-go 1.17
+go 1.19
 
-require gitlab.com/mjwhitta/errors v1.0.0
+require github.com/mjwhitta/errors v1.0.1

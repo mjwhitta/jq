@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"gitlab.com/mjwhitta/errors"
+	"github.com/mjwhitta/errors"
 )
 
 // JSON is a struct that holds a JSON blob.
