@@ -8,15 +8,15 @@ import (
 	"github.com/mjwhitta/jq"
 )
 
-var def = map[string]interface{}{
+var def = map[string]any{
 	"a": true,
 	"b": "asdf",
 	"c": 1234,
 	"d": [2]string{"blah", "test"},
-	"e": map[string]interface{}{
+	"e": map[string]any{
 		"aFloat": 1.2,
 		"anInt":  17,
-		"more": map[string]interface{}{
+		"more": map[string]any{
 			"aFloat32": 1.2,
 			"anInt64":  19,
 		},
@@ -124,7 +124,7 @@ func TestBadJSON(t *testing.T) {
 }
 
 func TestGetArray(t *testing.T) {
-	var actual []interface{}
+	var actual []any
 	var expected string
 	var e error
 	var j *jq.JSON
@@ -143,7 +143,7 @@ func TestGetArray(t *testing.T) {
 		t.Errorf("\ngot: %v\nwant: []", actual)
 	}
 
-	expected = "jq: key [a] is not of type []interface{}"
+	expected = "jq: key [a] is not of type []any"
 	if _, e = j.MustGetArray("a"); e == nil {
 		t.Errorf("\ngot: nil\nwant: %s", expected)
 	} else if e.Error() != expected {
@@ -264,7 +264,7 @@ func TestGetInt(t *testing.T) {
 }
 
 func TestGetMap(t *testing.T) {
-	var actual map[string]interface{}
+	var actual map[string]any
 	var e error
 	var expected string
 	var j *jq.JSON
@@ -273,7 +273,7 @@ func TestGetMap(t *testing.T) {
 
 	expected = fmt.Sprintf(
 		"%+v",
-		map[string]interface{}{
+		map[string]any{
 			"aFloat32": 1.2,
 			"anInt64":  19,
 		},
@@ -287,7 +287,7 @@ func TestGetMap(t *testing.T) {
 		t.Errorf("\ngot: %+v\nwant: map[]", actual)
 	}
 
-	expected = "jq: key [a] is not of type map[string]interface{}"
+	expected = "jq: key [a] is not of type map[string]any"
 	if _, e = j.MustGetMap("a"); e == nil {
 		t.Errorf("\ngot: nil\nwant: %s", expected)
 	} else if e.Error() != expected {
@@ -422,7 +422,7 @@ func TestSet(t *testing.T) {
 	var e error
 	var expected string
 	var j *jq.JSON
-	var newMap map[string]interface{}
+	var newMap map[string]any
 
 	j, _ = jq.New(json)
 
@@ -454,7 +454,7 @@ func TestSet(t *testing.T) {
 		t.Errorf("\ngot: %s\nwant: %s", e.Error(), expected)
 	}
 
-	newMap = map[string]interface{}{"asdf": "blah", "anInt": 7}
+	newMap = map[string]any{"asdf": "blah", "anInt": 7}
 
 	e = j.Set(newMap)
 	if e != nil {

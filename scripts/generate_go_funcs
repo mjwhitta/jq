@@ -37,19 +37,19 @@ generate_as_interface_func() {
 
     cat <<EOF
 func mustGet${family}${datatype}AsInterface(
-    val interface{},
+    val any,
 EOF
 
     case "$datatype" in
         "Array")
             cat <<EOF
-) (ret []interface{}) {
+) (ret []any) {
 EOF
             ;;
         "Map")
             cat <<EOF
-) (ret map[string]interface{}) {
-    ret = map[string]interface{}{}
+) (ret map[string]any) {
+    ret = map[string]any{}
 EOF
             ;;
     esac
@@ -95,9 +95,7 @@ generate_keys_func() {
     local family="$1" && shift
 
     cat <<EOF
-func mustGet${family}${datatype}Keys(
-    val interface{},
-) (ret []string) {
+func mustGet${family}${datatype}Keys(val any) (ret []string) {
 EOF
 
     case "$datatype" in
@@ -165,13 +163,13 @@ EOF
 
 generate_type_funcs() {
     local thetype="$1"
-    local rtype="${thetype:-interface{\}}"
+    local rtype="${thetype:-any}"
 
     case "$thetype" in
         "") ;;
         "bool")
             cat <<EOF
-func as${thetype^}(keys []interface{}, v interface{}) (ret $thetype, e error) {
+func as${thetype^}(keys []any, v any) (ret $thetype, e error) {
     switch v := v.(type) {
     case $thetype:
         ret = v
@@ -185,7 +183,7 @@ EOF
             ;;
         "float"*|"int"*|"uint"*)
             cat <<EOF
-func as${thetype^}(keys []interface{}, v interface{}) (ret $thetype, e error) {
+func as${thetype^}(keys []any, v any) (ret $thetype, e error) {
     switch v := v.(type) {
 EOF
 
@@ -211,7 +209,7 @@ EOF
             ;;
         "string")
             cat <<EOF
-func as${thetype^}(keys []interface{}, v interface{}) (ret $thetype, e error) {
+func as${thetype^}(keys []any, v any) (ret $thetype, e error) {
     switch v := v.(type) {
     case $thetype:
         ret = v
@@ -229,27 +227,27 @@ EOF
         "")
             cat <<EOF
 // Get will return the value for the specified key(s) as a $rtype.
-func (j *JSON) Get(keys ...interface{}) (ret $rtype) {
+func (j *JSON) Get(keys ...any) (ret $rtype) {
     ret, _ = j.MustGet(keys...)
     return
 }
 
 // GetArray will return an array for the specified key(s) as an
 // []$rtype.
-func (j *JSON) GetArray(keys ...interface{}) (ret []$rtype) {
+func (j *JSON) GetArray(keys ...any) (ret []$rtype) {
     ret, _ = j.MustGetArray(keys...)
     return
 }
 
 // GetMap will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) GetMap(keys ...interface{}) (ret map[string]$rtype) {
+func (j *JSON) GetMap(keys ...any) (ret map[string]$rtype) {
     ret, _ = j.MustGetMap(keys...)
     return
 }
 
 // MustGet will return the value for the specified key(s) as a $rtype.
-func (j *JSON) MustGet(keys ...interface{}) ($rtype, error) {
+func (j *JSON) MustGet(keys ...any) ($rtype, error) {
     return j.nestedGetKey(keys)
 }
 
@@ -259,29 +257,29 @@ EOF
             cat <<EOF
 // Get${thetype^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) Get${thetype^}(keys ...interface{}) (ret $rtype) {
+func (j *JSON) Get${thetype^}(keys ...any) (ret $rtype) {
     ret, _ = j.MustGet${thetype^}(keys...)
     return
 }
 
 // Get${thetype^}Array will return an array for the specified key(s) as a
 // []$rtype.
-func (j *JSON) Get${thetype^}Array(keys ...interface{}) (ret []$rtype) {
+func (j *JSON) Get${thetype^}Array(keys ...any) (ret []$rtype) {
     ret, _ = j.MustGet${thetype^}Array(keys...)
     return
 }
 
 // Get${thetype^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) Get${thetype^}Map(keys ...interface{}) (ret map[string]$rtype) {
+func (j *JSON) Get${thetype^}Map(keys ...any) (ret map[string]$rtype) {
     ret, _ = j.MustGet${thetype^}Map(keys...)
     return
 }
 
 // MustGet${thetype^} will return the value for the specified key(s) as a
 // $rtype.
-func (j *JSON) MustGet${thetype^}(keys ...interface{}) (ret $rtype, e error) {
-    var val interface{}
+func (j *JSON) MustGet${thetype^}(keys ...any) (ret $rtype, e error) {
+    var val any
 
     if val, e = j.nestedGetKey(keys); e != nil {
         return
@@ -293,9 +291,9 @@ func (j *JSON) MustGet${thetype^}(keys ...interface{}) (ret $rtype, e error) {
 
 // MustGet${thetype^}Array will return an array for the specified key(s)
 // as a []$rtype.
-func (j *JSON) MustGet${thetype^}Array(keys ...interface{}) (ret []$rtype, e error) {
+func (j *JSON) MustGet${thetype^}Array(keys ...any) (ret []$rtype, e error) {
     var tmp $rtype
-    var val interface{}
+    var val any
 
     if val, e = j.nestedGetKey(keys); e != nil {
         return
@@ -306,12 +304,12 @@ func (j *JSON) MustGet${thetype^}Array(keys ...interface{}) (ret []$rtype, e err
         return
     }
 
-    if _, ok := val.([]interface{}); !ok {
+    if _, ok := val.([]any); !ok {
         e = errors.Newf("key %v is not of type []$rtype", keys)
         return
     }
 
-    for _, v := range val.([]interface{}) {
+    for _, v := range val.([]any) {
         // No need to wrap e
         if tmp, e = as${thetype^}(keys, v); e != nil {
             ret = []$rtype{}
@@ -325,8 +323,8 @@ func (j *JSON) MustGet${thetype^}Array(keys ...interface{}) (ret []$rtype, e err
 
 // MustGet${thetype^}Map will return a map for the specified key(s) as a
 // map[string]$rtype.
-func (j *JSON) MustGet${thetype^}Map(keys ...interface{}) (ret map[string]$rtype, e error) {
-    var val interface{}
+func (j *JSON) MustGet${thetype^}Map(keys ...any) (ret map[string]$rtype, e error) {
+    var val any
 
     ret = map[string]$rtype{}
 
@@ -339,7 +337,7 @@ func (j *JSON) MustGet${thetype^}Map(keys ...interface{}) (ret map[string]$rtype
         return
     }
 
-    for k, v := range val.(map[string]interface{}) {
+    for k, v := range val.(map[string]any) {
         // No need to wrap e
         if ret[k], e = as${thetype^}(keys, v); e != nil {
             ret = map[string]$rtype{}
@@ -429,7 +427,7 @@ $(
     done; unset thetype
 
     for datatype in Array Map; do
-        generate_keys_func "$datatype" "" bool string interface{}
+        generate_keys_func "$datatype" "" bool string any
         generate_keys_func "$datatype" "Float" float32 float64
         generate_keys_func "$datatype" "Int" int int8 int16 int32 \
             int64
