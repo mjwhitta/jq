@@ -101,7 +101,7 @@ EOF
     case "$datatype" in
         "Map")
             cat <<EOF
-	var less = func(i, j int) bool {
+    var less lessFunc = func(i int, j int) bool {
         if strings.EqualFold(ret[i], ret[j]) {
             return ret[i] < ret[j]
         }
@@ -413,6 +413,8 @@ import (
 
     "github.com/mjwhitta/errors"
 )
+
+type lessFunc func(i int, j int) bool
 
 $(
     for thetype in \

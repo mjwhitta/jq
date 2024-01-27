@@ -1,4 +1,4 @@
 package jq
 
 // Version is the package version.
-const Version = "1.5.4"
+const Version = "1.5.5"

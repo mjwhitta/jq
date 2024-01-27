@@ -9,6 +9,8 @@ import (
 	"github.com/mjwhitta/errors"
 )
 
+type lessFunc func(i int, j int) bool
+
 // Get will return the value for the specified key(s) as a any.
 func (j *JSON) Get(keys ...any) (ret any) {
 	ret, _ = j.MustGet(keys...)
@@ -1921,7 +1923,7 @@ func mustGetUintArrayAsInterface(
 }
 
 func mustGetMapKeys(val any) (ret []string) {
-	var less = func(i, j int) bool {
+	var less lessFunc = func(i int, j int) bool {
 		if strings.EqualFold(ret[i], ret[j]) {
 			return ret[i] < ret[j]
 		}
@@ -1950,7 +1952,7 @@ func mustGetMapKeys(val any) (ret []string) {
 }
 
 func mustGetFloatMapKeys(val any) (ret []string) {
-	var less = func(i, j int) bool {
+	var less lessFunc = func(i int, j int) bool {
 		if strings.EqualFold(ret[i], ret[j]) {
 			return ret[i] < ret[j]
 		}
@@ -1975,7 +1977,7 @@ func mustGetFloatMapKeys(val any) (ret []string) {
 }
 
 func mustGetIntMapKeys(val any) (ret []string) {
-	var less = func(i, j int) bool {
+	var less lessFunc = func(i int, j int) bool {
 		if strings.EqualFold(ret[i], ret[j]) {
 			return ret[i] < ret[j]
 		}
@@ -2012,7 +2014,7 @@ func mustGetIntMapKeys(val any) (ret []string) {
 }
 
 func mustGetUintMapKeys(val any) (ret []string) {
-	var less = func(i, j int) bool {
+	var less lessFunc = func(i int, j int) bool {
 		if strings.EqualFold(ret[i], ret[j]) {
 			return ret[i] < ret[j]
 		}

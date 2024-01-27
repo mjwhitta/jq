@@ -46,7 +46,7 @@ func (j *JSON) Clear() {
 // GetBlob will return the JSON blob as a string. An indentation
 // string and a prefix string are accepted as optionally parameters.
 func (j *JSON) GetBlob(params ...string) (ret string, e error) {
-	var blob = &strings.Builder{}
+	var blob *strings.Builder = &strings.Builder{}
 	var enc *json.Encoder = json.NewEncoder(blob)
 	var indent string
 	var pre string
@@ -313,7 +313,7 @@ func (j *JSON) Set(value any, keys ...any) error {
 // SetBlob will replace the underlying map[string]any with a
 // new JSON blob.
 func (j *JSON) SetBlob(blob ...string) error {
-	var blobStr = strings.TrimSpace(strings.Join(blob, ""))
+	var blobStr string = strings.TrimSpace(strings.Join(blob, ""))
 	var dec *json.Decoder
 	var e error
 
@@ -337,7 +337,7 @@ func (j *JSON) SetEscapeHTML(escape bool) {
 	j.escape = escape
 }
 
-// String will return a string representation of JSON instance.
+// String will return a string representation of the JSON.
 func (j *JSON) String() (ret string) {
 	ret, _ = j.GetBlob("  ")
 
