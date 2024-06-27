@@ -14,7 +14,7 @@ This Go module allows you to parse JSON blobs in a "sane" manner.
 Open a terminal and run the following:
 
 ```
-$ go get --ldflags "-s -w" --trimpath -u github.com/mjwhitta/jq
+$ go get -u github.com/mjwhitta/jq
 ```
 
 ## Usage
